@@ -53,7 +53,7 @@ def inject_global_styles() -> None:
     }}
 
     /* Global sentence case and remove all-caps transforms */
-    button, [role="tab"], th, label, .stSelectbox label, .stSlider label {{
+    button, [role="tab"], th, label, input, select, textarea, .stSelectbox label, .stSlider label {{
         text-transform: none !important;
         letter-spacing: normal !important;
         font-family: {FONT_FAMILY} !important;
@@ -117,6 +117,26 @@ def inject_global_styles() -> None:
         font-size: 11px;
         color: {COLOR_MUTED_INK};
         margin-top: 3px;
+    }}
+
+    /* Responsive adjustments for mobile viewports (<= 768px, 390px) */
+    @media (max-width: 768px) {{
+        .metric-strip-container {{
+            flex-wrap: wrap !important;
+            padding: 8px 0 !important;
+        }}
+        .metric-strip-item {{
+            flex: 1 1 45% !important;
+            padding: 8px 12px !important;
+            border-right: none !important;
+            border-bottom: 1px solid {COLOR_BORDER} !important;
+        }}
+        .metric-strip-item:last-child {{
+            border-bottom: none !important;
+        }}
+        .metric-strip-value {{
+            font-size: 18px !important;
+        }}
     }}
 
     /* Simple Callout */

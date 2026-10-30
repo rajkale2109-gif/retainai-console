@@ -19,7 +19,6 @@ from app.views import (
 # Page configuration
 st.set_page_config(
     page_title="RetainAI",
-    page_icon="📈",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -57,10 +56,16 @@ def render_sidebar_nav() -> str:
         "Model and threshold": "Evaluate",
     }
 
+    # Allow URL query param navigation (e.g. ?page=Risk+queue)
+    query_page = st.query_params.get("page")
+    default_index = 0
+    if query_page and query_page in nav_options:
+        default_index = nav_options.index(query_page)
+
     selected_page = st.sidebar.radio(
         label="Navigation",
         options=nav_options,
-        index=0,
+        index=default_index,
         label_visibility="collapsed",
     )
 
