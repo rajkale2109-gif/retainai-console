@@ -62,8 +62,7 @@ def render() -> None:
     col1, col2 = st.columns([1, 1], gap="large")
 
     with col1:
-        st.markdown("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>Net expected value by segment</p>", unsafe_allow_html=True)
-        st.markdown("<p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>Total incremental value generated across each segment after contact costs</p>", unsafe_allow_html=True)
+        st.html("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>Net expected value by segment</p><p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>Total incremental value generated across each segment after contact costs</p>")
 
         chart_df = summary_df.sort_values(by="total_expected_value", ascending=True)
 
@@ -85,11 +84,10 @@ def render() -> None:
             height=280,
         )
         apply_chart_theme(fig_ev, height=280)
-        st.plotly_chart(fig_ev, use_container_width=True, config={"displayModeBar": False})
+        st.plotly_chart(fig_ev, width="stretch", config={"displayModeBar": False})
 
     with col2:
-        st.markdown("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>Segment distribution</p>", unsafe_allow_html=True)
-        st.markdown("<p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>User count and average predicted dormancy risk per segment</p>", unsafe_allow_html=True)
+        st.html("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>Segment distribution</p><p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>User count and average predicted dormancy risk per segment</p>")
 
         fig_dist = go.Figure(
             go.Bar(
@@ -108,13 +106,12 @@ def render() -> None:
             height=280,
         )
         apply_chart_theme(fig_dist, height=280)
-        st.plotly_chart(fig_dist, use_container_width=True, config={"displayModeBar": False})
+        st.plotly_chart(fig_dist, width="stretch", config={"displayModeBar": False})
 
-    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+    st.html("<div style='height: 12px;'></div>")
 
     # 3. Summary Table
-    st.markdown("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>Segment economics summary table</p>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>Assumed unit economics, contactable volume, and expected value parameters</p>", unsafe_allow_html=True)
+    st.html("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>Segment economics summary table</p><p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>Assumed unit economics, contactable volume, and expected value parameters</p>")
 
     tbl_df = summary_df.copy()
     tbl_display = pd.DataFrame({
@@ -129,37 +126,34 @@ def render() -> None:
         "Primary channel": tbl_df["channel"],
     })
 
-    st.dataframe(tbl_display, use_container_width=True, hide_index=True)
+    st.dataframe(tbl_display, width="stretch", hide_index=True)
 
-    st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
+    st.html("<div style='height: 20px;'></div>")
 
     # 4. Playbook per Segment Cards
-    st.markdown("<p style='font-weight: 600; font-size: 15px; margin-bottom: 4px;'>Playbook per segment</p>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 16px;'>Standard operating intervention procedures and message copy declared in configuration.</p>", unsafe_allow_html=True)
+    st.html("<p style='font-weight: 600; font-size: 15px; margin-bottom: 4px;'>Playbook per segment</p><p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 16px;'>Standard operating intervention procedures and message copy declared in configuration.</p>")
 
     for seg_name, pbook in SEGMENT_PLAYBOOK.items():
         rule_desc = SEGMENT_DESCRIPTIONS.get(seg_name, "")
         seg_stats = summary_df[summary_df["segment"] == seg_name].iloc[0]
 
-        st.markdown(
-            f"""
-            <div style="background: {COLOR_SURFACE}; border: 1px solid {COLOR_BORDER}; padding: 18px; margin-bottom: 16px;">
-                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
-                    <div style="font-weight: 700; font-size: 15px; color: {COLOR_INK};">{seg_name}</div>
-                    <div style="font-size: 12px; color: {COLOR_MUTED_INK};">Rule: <em>{rule_desc}</em></div>
-                </div>
-                <div style="font-size: 12px; color: {COLOR_MUTED_INK}; margin-bottom: 12px; border-bottom: 1px solid {COLOR_BORDER}; padding-bottom: 8px;">
-                    Users: <strong>{seg_stats['user_count']:,}</strong> ({seg_stats['user_pct']}%) &nbsp;|&nbsp;
-                    Avg risk: <strong>{seg_stats['avg_risk'] * 100:.1f}%</strong> &nbsp;|&nbsp;
-                    Assumed save rate: <strong>{pbook.save_rate * 100:.0f}%</strong> &nbsp;|&nbsp;
-                    LTV: <strong>{format_rupees(pbook.lifetime_value)}</strong> &nbsp;|&nbsp;
-                    Net EV: <strong>{format_rupees(seg_stats['total_expected_value'])}</strong>
-                </div>
-                <div style="font-size: 13px; margin-bottom: 4px;"><strong>Recommended action:</strong> {pbook.action}</div>
-                <div style="font-size: 13px; margin-bottom: 10px;"><strong>Channel:</strong> {pbook.channel} &nbsp;|&nbsp; <strong>Contact decision:</strong> Contact if (Risk x {pbook.save_rate} x ₹{pbook.lifetime_value:,.0f}) > ₹{CONTACT_COST_INR:.0f}</div>
-                <div style="font-size: 12px; font-weight: 600; color: {COLOR_MUTED_INK}; margin-bottom: 4px;">Standard copy template:</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
+        card_html = (
+            f'<div style="background: {COLOR_SURFACE}; border: 1px solid {COLOR_BORDER}; padding: 18px; margin-bottom: 16px;">'
+            f'<div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">'
+            f'<div style="font-weight: 700; font-size: 15px; color: {COLOR_INK};">{seg_name}</div>'
+            f'<div style="font-size: 12px; color: {COLOR_MUTED_INK};">Rule: <em>{rule_desc}</em></div>'
+            f'</div>'
+            f'<div style="font-size: 12px; color: {COLOR_MUTED_INK}; margin-bottom: 12px; border-bottom: 1px solid {COLOR_BORDER}; padding-bottom: 8px;">'
+            f'Users: <strong>{seg_stats["user_count"]:,}</strong> ({seg_stats["user_pct"]}%) &nbsp;|&nbsp; '
+            f'Avg risk: <strong>{seg_stats["avg_risk"] * 100:.1f}%</strong> &nbsp;|&nbsp; '
+            f'Assumed save rate: <strong>{pbook.save_rate * 100:.0f}%</strong> &nbsp;|&nbsp; '
+            f'LTV: <strong>{format_rupees(pbook.lifetime_value)}</strong> &nbsp;|&nbsp; '
+            f'Net EV: <strong>{format_rupees(seg_stats["total_expected_value"])}</strong>'
+            f'</div>'
+            f'<div style="font-size: 13px; margin-bottom: 4px;"><strong>Recommended action:</strong> {pbook.action}</div>'
+            f'<div style="font-size: 13px; margin-bottom: 10px;"><strong>Channel:</strong> {pbook.channel} &nbsp;|&nbsp; <strong>Contact decision:</strong> Contact if (Risk x {pbook.save_rate} x ₹{pbook.lifetime_value:,.0f}) > ₹{CONTACT_COST_INR:.0f}</div>'
+            f'<div style="font-size: 12px; font-weight: 600; color: {COLOR_MUTED_INK}; margin-bottom: 4px;">Standard copy template:</div>'
+            f'</div>'
         )
+        st.html(card_html)
         render_callout(f'"{pbook.message}"', tone="neutral")

@@ -10,6 +10,7 @@ Design Rules (from SPEC.md):
 - Rupees use Indian digit grouping. Empty states say what to do next. Plain verbs.
 """
 
+import textwrap
 from typing import Any, Dict, List, Optional
 import streamlit as st
 import plotly.graph_objects as go
@@ -31,139 +32,64 @@ FONT_FAMILY = "'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', san
 def inject_global_styles() -> None:
     """Inject Public Sans typography, clean neutral styling, and strip default decorations."""
     css = f"""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap');
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap');
 
-    html, body, [class*="css"], .stMarkdown, .stText, p, div, span, h1, h2, h3, h4, h5, h6 {{
-        font-family: {FONT_FAMILY} !important;
-        color: {COLOR_INK};
-    }}
+html, body, .stApp, .stMarkdown, .stText, p, h1, h2, h3, h4, h5, h6, label, input, button, select, textarea {{
+    font-family: {FONT_FAMILY} !important;
+    color: {COLOR_INK};
+}}
 
-    /* Canvas background */
-    .stApp {{
-        background-color: {COLOR_CANVAS};
-    }}
+[data-testid="stIconMaterial"], .material-symbols-rounded, .material-symbols-outlined, .material-icons {{
+    font-family: 'Material Symbols Rounded', 'Material Icons' !important;
+}}
 
-    /* Remove drop shadows and border radii gradients */
-    div[data-testid="stMetric"], .stMetric, div[data-testid="stExpander"] {{
-        background-color: {COLOR_SURFACE} !important;
-        border: 1px solid {COLOR_BORDER} !important;
-        border-radius: 2px !important;
-        box-shadow: none !important;
-    }}
+.stApp {{
+    background-color: {COLOR_CANVAS};
+}}
 
-    /* Global sentence case and remove all-caps transforms */
-    button, [role="tab"], th, label, input, select, textarea, .stSelectbox label, .stSlider label {{
-        text-transform: none !important;
-        letter-spacing: normal !important;
-        font-family: {FONT_FAMILY} !important;
-    }}
+div[data-testid="stMetric"], .stMetric, div[data-testid="stExpander"] {{
+    background-color: {COLOR_SURFACE} !important;
+    border: 1px solid {COLOR_BORDER} !important;
+    border-radius: 2px !important;
+    box-shadow: none !important;
+}}
 
-    /* Sidebar minimal navigation styling */
-    section[data-testid="stSidebar"] {{
-        background-color: {COLOR_SURFACE};
-        border-right: 1px solid {COLOR_BORDER};
-    }}
+button, [role="tab"], th, label, input, select, textarea, .stSelectbox label, .stSlider label {{
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    font-family: {FONT_FAMILY} !important;
+}}
 
-    /* Buttons: Petrol accent, no shadows */
-    .stButton > button {{
-        background-color: {COLOR_PETROL} !important;
-        color: #FFFFFF !important;
-        border: 1px solid {COLOR_PETROL} !important;
-        border-radius: 2px !important;
-        box-shadow: none !important;
-        font-weight: 500 !important;
-        font-size: 13px !important;
-        padding: 6px 14px !important;
-    }}
-    .stButton > button:hover {{
-        background-color: #0B4653 !important;
-        border-color: #0B4653 !important;
-        color: #FFFFFF !important;
-    }}
+section[data-testid="stSidebar"] {{
+    background-color: {COLOR_SURFACE};
+    border-right: 1px solid {COLOR_BORDER};
+}}
 
-    /* Ruled metric strip */
-    .metric-strip-container {{
-        display: flex;
-        flex-direction: row;
-        width: 100%;
-        background-color: {COLOR_SURFACE};
-        border-top: 1px solid {COLOR_BORDER};
-        border-bottom: 1px solid {COLOR_BORDER};
-        margin: 16px 0 24px 0;
-        padding: 14px 0;
-    }}
-    .metric-strip-item {{
-        flex: 1;
-        padding: 0 20px;
-        border-right: 1px solid {COLOR_BORDER};
-    }}
-    .metric-strip-item:last-child {{
-        border-right: none;
-    }}
-    .metric-strip-label {{
-        font-size: 12px;
-        color: {COLOR_MUTED_INK};
-        margin-bottom: 4px;
-        font-weight: 500;
-    }}
-    .metric-strip-value {{
-        font-size: 24px;
-        font-weight: 600;
-        color: {COLOR_INK};
-        line-height: 1.2;
-    }}
-    .metric-strip-sub {{
-        font-size: 11px;
-        color: {COLOR_MUTED_INK};
-        margin-top: 3px;
-    }}
+.stButton > button {{
+    background-color: {COLOR_PETROL} !important;
+    color: #FFFFFF !important;
+    border: 1px solid {COLOR_PETROL} !important;
+    border-radius: 2px !important;
+    box-shadow: none !important;
+    font-weight: 500 !important;
+    font-size: 13px !important;
+    padding: 6px 14px !important;
+}}
 
-    /* Responsive adjustments for mobile viewports (<= 768px, 390px) */
-    @media (max-width: 768px) {{
-        .metric-strip-container {{
-            flex-wrap: wrap !important;
-            padding: 8px 0 !important;
-        }}
-        .metric-strip-item {{
-            flex: 1 1 45% !important;
-            padding: 8px 12px !important;
-            border-right: none !important;
-            border-bottom: 1px solid {COLOR_BORDER} !important;
-        }}
-        .metric-strip-item:last-child {{
-            border-bottom: none !important;
-        }}
-        .metric-strip-value {{
-            font-size: 18px !important;
-        }}
-    }}
+.stButton > button:hover {{
+    background-color: #0B4653 !important;
+    border-color: #0B4653 !important;
+    color: #FFFFFF !important;
+}}
 
-    /* Simple Callout */
-    .callout-box {{
-        padding: 12px 16px;
-        background-color: {COLOR_SURFACE};
-        border: 1px solid {COLOR_BORDER};
-        border-left: 3px solid {COLOR_PETROL};
-        margin: 12px 0;
-        font-size: 13px;
-        color: {COLOR_INK};
-    }}
-    .callout-box.warning {{
-        border-left-color: {COLOR_AMBER};
-    }}
-    .callout-box.danger {{
-        border-left-color: {COLOR_MUTED_RED};
-    }}
-
-    /* Table styling */
-    div[data-testid="stDataFrame"] {{
-        border: 1px solid {COLOR_BORDER};
-        background-color: {COLOR_SURFACE};
-    }}
-    </style>
-    """
-    st.markdown(css, unsafe_allow_html=True)
+div[data-testid="stDataFrame"] {{
+    border: 1px solid {COLOR_BORDER};
+    background-color: {COLOR_SURFACE};
+}}
+</style>
+"""
+    st.html(css)
 
 
 def format_rupees(amount: float, compact: bool = False) -> str:
@@ -182,7 +108,6 @@ def format_rupees(amount: float, compact: bool = False) -> str:
         if abs_amt >= 1_000:
             return f"{sign}₹{abs_amt / 1_000:.1f}k"
 
-    # Exact Indian comma grouping (last 3 digits, then groups of 2)
     int_part = int(round(abs_amt))
     s = str(int_part)
     if len(s) <= 3:
@@ -203,54 +128,68 @@ def format_rupees(amount: float, compact: bool = False) -> str:
 
 def render_metric_strip(metrics: List[Dict[str, Any]]) -> None:
     """Render key figures in one ruled strip across the screen."""
-    items_html = []
+    items = []
     for m in metrics:
         label = m.get("label", "")
         value = m.get("value", "")
         sub = m.get("sub", "")
-        sub_html = f'<div class="metric-strip-sub">{sub}</div>' if sub else ""
-        items_html.append(f"""
-            <div class="metric-strip-item">
-                <div class="metric-strip-label">{label}</div>
-                <div class="metric-strip-value">{value}</div>
-                {sub_html}
-            </div>
-        """)
+        sub_html = f'<div style="font-size:11px; color:#5A6572; margin-top:3px;">{sub}</div>' if sub else ""
+        items.append(
+            f'<div style="flex:1; padding:0 18px; border-right:1px solid #E2E5E9; min-width:120px;">'
+            f'<div style="font-size:12px; color:#5A6572; margin-bottom:4px; font-weight:500;">{label}</div>'
+            f'<div style="font-size:24px; font-weight:600; color:#17212B; line-height:1.2;">{value}</div>'
+            f'{sub_html}'
+            f'</div>'
+        )
 
-    strip_html = f"""
-        <div class="metric-strip-container">
-            {"".join(items_html)}
-        </div>
-    """
-    st.markdown(strip_html, unsafe_allow_html=True)
+    if items:
+        items[-1] = items[-1].replace("border-right:1px solid #E2E5E9;", "border-right:none;")
+
+    strip_html = (
+        f'<div style="display:flex; flex-direction:row; flex-wrap:wrap; width:100%; background:#FFFFFF; '
+        f'border-top:1px solid #E2E5E9; border-bottom:1px solid #E2E5E9; margin:14px 0 22px 0; padding:14px 0;">'
+        f'{"".join(items)}'
+        f'</div>'
+    )
+    st.html(strip_html)
 
 
 def render_section_header(title: str, description: Optional[str] = None) -> None:
     """Render a clean, plain sentence-case section header."""
-    st.markdown(f"<h3 style='margin-bottom: 2px; font-weight: 600; font-size: 18px;'>{title}</h3>", unsafe_allow_html=True)
+    header_html = f"<h3 style='margin-bottom: 2px; font-weight: 600; font-size: 18px;'>{title}</h3>"
     if description:
-        st.markdown(f"<p style='color: {COLOR_MUTED_INK}; font-size: 13px; margin-top: 0; margin-bottom: 16px;'>{description}</p>", unsafe_allow_html=True)
+        header_html += f"<p style='color: {COLOR_MUTED_INK}; font-size: 13px; margin-top: 0; margin-bottom: 16px;'>{description}</p>"
+    st.html(header_html)
 
 
 def render_callout(text: str, tone: str = "neutral") -> None:
     """Render a clean callout box with plain verbs and no emoji."""
-    cls_name = "callout-box"
-    if tone in ["warning", "danger"]:
-        cls_name += f" {tone}"
-    st.markdown(f'<div class="{cls_name}">{text}</div>', unsafe_allow_html=True)
+    border_color = "#0E5A6B"
+    if tone == "warning":
+        border_color = "#B7791F"
+    elif tone == "danger":
+        border_color = "#A63D40"
+
+    callout_html = (
+        f'<div style="padding:12px 16px; background-color:#FFFFFF; border:1px solid #E2E5E9; '
+        f'border-left:3px solid {border_color}; margin:12px 0; font-size:13px; color:#17212B; line-height:1.5;">'
+        f'{text}'
+        f'</div>'
+    )
+    st.html(callout_html)
 
 
 def render_empty_state(title: str, message: str, command: Optional[str] = None) -> None:
     """Render an informative empty state explaining what to do next."""
     cmd_html = f"<div style='margin-top: 14px; font-family: monospace; background: #EEF0F3; padding: 8px 12px; display: inline-block; font-size: 13px;'>{command}</div>" if command else ""
-    empty_html = f"""
-    <div style="background-color: {COLOR_SURFACE}; border: 1px solid {COLOR_BORDER}; padding: 36px 24px; text-align: center; margin: 24px 0;">
-        <h4 style="margin: 0 0 8px 0; font-weight: 600; font-size: 16px;">{title}</h4>
-        <p style="color: {COLOR_MUTED_INK}; font-size: 14px; margin: 0; max-width: 540px; margin: 0 auto;">{message}</p>
-        {cmd_html}
-    </div>
-    """
-    st.markdown(empty_html, unsafe_allow_html=True)
+    empty_html = (
+        f"<div style='background-color: {COLOR_SURFACE}; border: 1px solid {COLOR_BORDER}; padding: 36px 24px; text-align: center; margin: 24px 0;'>"
+        f"<h4 style='margin: 0 0 8px 0; font-weight: 600; font-size: 16px;'>{title}</h4>"
+        f"<p style='color: {COLOR_MUTED_INK}; font-size: 14px; margin: 0; max-width: 540px; margin: 0 auto;'>{message}</p>"
+        f"{cmd_html}"
+        f"</div>"
+    )
+    st.html(empty_html)
 
 
 def apply_chart_theme(fig: go.Figure, height: int = 380) -> go.Figure:

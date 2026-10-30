@@ -37,14 +37,11 @@ inject_global_styles()
 
 def render_sidebar_nav() -> str:
     """Render grouped navigation sidebar matching SPEC.md."""
-    st.sidebar.markdown(
-        """
-        <div style="padding: 12px 0 20px 0;">
-            <div style="font-size: 20px; font-weight: 700; color: #17212B; letter-spacing: -0.3px;">RetainAI</div>
-            <div style="font-size: 12px; color: #5A6572; margin-top: 2px;">Retention console</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    st.sidebar.html(
+        '<div style="padding: 12px 0 20px 0;">'
+        '<div style="font-size: 20px; font-weight: 700; color: #17212B; letter-spacing: -0.3px;">RetainAI</div>'
+        '<div style="font-size: 12px; color: #5A6572; margin-top: 2px;">Retention console</div>'
+        '</div>'
     )
 
     nav_options = [
@@ -77,15 +74,12 @@ def render_sidebar_nav() -> str:
         label_visibility="collapsed",
     )
 
-    st.sidebar.markdown(
-        """
-        <div style="margin-top: 36px; padding-top: 16px; border-top: 1px solid #E2E5E9; font-size: 11px; color: #5A6572;">
-            <div>Retail broking retention</div>
-            <div style="margin-top: 4px;">Prediction: Day 14</div>
-            <div>Dormancy: Day 61-90</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    st.sidebar.html(
+        '<div style="margin-top: 36px; padding-top: 16px; border-top: 1px solid #E2E5E9; font-size: 11px; color: #5A6572;">'
+        '<div>Retail broking retention</div>'
+        '<div style="margin-top: 4px;">Prediction: Day 14</div>'
+        '<div>Dormancy: Day 61-90</div>'
+        '</div>'
     )
 
     return selected_page

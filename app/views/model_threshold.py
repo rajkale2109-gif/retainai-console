@@ -53,8 +53,7 @@ def render() -> None:
     col1, col2 = st.columns([1, 1], gap="large")
 
     with col1:
-        st.markdown("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>Model comparison on hold-out set</p>", unsafe_allow_html=True)
-        st.markdown(f"<p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>Evaluated on signups on/after {metrics_data.get('split_date', '2025-10-01')} ({metrics_data.get('test_size', 0):,} users)</p>", unsafe_allow_html=True)
+        st.html(f"<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>Model comparison on hold-out set</p><p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>Evaluated on signups on/after {metrics_data.get('split_date', '2025-10-01')} ({metrics_data.get('test_size', 0):,} users)</p>")
 
         comp_df = pd.DataFrame({
             "Metric": ["ROC AUC", "PR AUC", "Brier Score", "Top-Decile Capture", "Top-Decile Lift"],
@@ -73,11 +72,10 @@ def render() -> None:
                 f"{gb_metrics['top_decile_lift']:.2f}x",
             ],
         })
-        st.dataframe(comp_df, use_container_width=True, hide_index=True)
+        st.dataframe(comp_df, width="stretch", hide_index=True)
 
     with col2:
-        st.markdown("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>ROC curve (Gradient Boosting)</p>", unsafe_allow_html=True)
-        st.markdown("<p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>True positive rate vs false positive rate across classification thresholds</p>", unsafe_allow_html=True)
+        st.html("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>ROC curve (Gradient Boosting)</p><p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>True positive rate vs false positive rate across classification thresholds</p>")
 
         roc_pts = metrics_data.get("roc_curve_gb", [])
         if roc_pts:
@@ -113,13 +111,12 @@ def render() -> None:
                 showlegend=True,
             )
             apply_chart_theme(fig_roc, height=260)
-            st.plotly_chart(fig_roc, use_container_width=True, config={"displayModeBar": False})
+            st.plotly_chart(fig_roc, width="stretch", config={"displayModeBar": False})
 
-    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+    st.html("<div style='height: 12px;'></div>")
 
     # 3. Permutation Feature Importance
-    st.markdown("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>Top risk drivers (Permutation importance)</p>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>Impact on model ROC AUC when each day-14 feature is randomly permuted</p>", unsafe_allow_html=True)
+    st.html("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>Top risk drivers (Permutation importance)</p><p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>Impact on model ROC AUC when each day-14 feature is randomly permuted</p>")
 
     importances = metrics_data.get("feature_importances", [])
     if importances:
@@ -144,13 +141,12 @@ def render() -> None:
             height=280,
         )
         apply_chart_theme(fig_imp, height=280)
-        st.plotly_chart(fig_imp, use_container_width=True, config={"displayModeBar": False})
+        st.plotly_chart(fig_imp, width="stretch", config={"displayModeBar": False})
 
-    st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
+    st.html("<div style='height: 16px;'></div>")
 
     # 4. Economic Contact Threshold Optimizer
-    st.markdown("<p style='font-weight: 600; font-size: 15px; margin-bottom: 4px;'>Economic contact threshold optimizer</p>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 16px;'>Simulate contact cost and save rate assumptions to find the exact risk cutoff that maximizes portfolio Expected Value.</p>", unsafe_allow_html=True)
+    st.html("<p style='font-weight: 600; font-size: 15px; margin-bottom: 4px;'>Economic contact threshold optimizer</p><p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 16px;'>Simulate contact cost and save rate assumptions to find the exact risk cutoff that maximizes portfolio Expected Value.</p>")
 
     s1, s2, s3 = st.columns(3)
     with s1:
@@ -225,7 +221,7 @@ def render() -> None:
         showlegend=True,
     )
     apply_chart_theme(fig_opt, height=300)
-    st.plotly_chart(fig_opt, use_container_width=True, config={"displayModeBar": False})
+    st.plotly_chart(fig_opt, width="stretch", config={"displayModeBar": False})
 
     # Strategy callout
     render_callout(

@@ -14,6 +14,7 @@ from app.ui import (
     COLOR_PETROL,
     COLOR_SURFACE,
     apply_chart_theme,
+    render_callout,
     render_metric_strip,
     render_section_header,
 )
@@ -63,8 +64,7 @@ def render() -> None:
     col1, col2 = st.columns([1.05, 0.95], gap="large")
 
     with col1:
-        st.markdown("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>Onboarding conversion funnel</p>", unsafe_allow_html=True)
-        st.markdown("<p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>Conversion rates across each step of the customer journey</p>", unsafe_allow_html=True)
+        st.html("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>Onboarding conversion funnel</p><p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>Conversion rates across each step of the customer journey</p>")
 
         stages = ["Signups", "KYC completed", "Funded account", "Traded <= 30 days"]
         stage_counts = [total_signups, kyc_cnt, fund_cnt, trade_cnt]
@@ -93,11 +93,10 @@ def render() -> None:
             height=320,
         )
         apply_chart_theme(fig_funnel, height=320)
-        st.plotly_chart(fig_funnel, use_container_width=True, config={"displayModeBar": False})
+        st.plotly_chart(fig_funnel, width="stretch", config={"displayModeBar": False})
 
     with col2:
-        st.markdown("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>Dormancy by time to first trade</p>", unsafe_allow_html=True)
-        st.markdown("<p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>Day 61-90 dormancy rate by speed of first transaction</p>", unsafe_allow_html=True)
+        st.html("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>Dormancy by time to first trade</p><p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>Day 61-90 dormancy rate by speed of first transaction</p>")
 
         trade_timing_df = get_time_to_first_trade()
         if not trade_timing_df.empty:
@@ -127,7 +126,7 @@ def render() -> None:
                 height=320,
             )
             apply_chart_theme(fig_timing, height=320)
-            st.plotly_chart(fig_timing, use_container_width=True, config={"displayModeBar": False})
+            st.plotly_chart(fig_timing, width="stretch", config={"displayModeBar": False})
 
     # Funnel and trading velocity diagnostic callout
     render_callout(
@@ -135,11 +134,10 @@ def render() -> None:
         tone="neutral",
     )
 
-    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+    st.html("<div style='height: 12px;'></div>")
 
     # 3. Monthly Cohort Retention Heatmap
-    st.markdown("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>Monthly cohort retention heatmap</p>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>Percentage of investors active in app sessions or trades across key lifecycle intervals</p>", unsafe_allow_html=True)
+    st.html("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>Monthly cohort retention heatmap</p><p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>Percentage of investors active in app sessions or trades across key lifecycle intervals</p>")
 
     if not retention_df.empty:
         cohorts = retention_df["cohort_month"].tolist()
@@ -190,4 +188,4 @@ def render() -> None:
             height=360,
         )
         apply_chart_theme(fig_heat, height=360)
-        st.plotly_chart(fig_heat, use_container_width=True, config={"displayModeBar": False})
+        st.plotly_chart(fig_heat, width="stretch", config={"displayModeBar": False})

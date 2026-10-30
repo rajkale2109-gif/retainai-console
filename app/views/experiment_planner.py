@@ -21,8 +21,7 @@ def render() -> None:
     )
 
     # 1. Sample Size Calculator
-    st.markdown("<p style='font-weight: 600; font-size: 15px; margin-bottom: 4px;'>1. Sample-size calculator</p>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 16px;'>Determine the statistical power and sample size required to validate an intervention before rollout.</p>", unsafe_allow_html=True)
+    st.html("<p style='font-weight: 600; font-size: 15px; margin-bottom: 4px;'>1. Sample-size calculator</p><p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 16px;'>Determine the statistical power and sample size required to validate an intervention before rollout.</p>")
 
     preset_col, _ = st.columns([1.5, 2.5])
     with preset_col:
@@ -69,65 +68,54 @@ def render() -> None:
     ]
     render_metric_strip(size_metrics)
 
-    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+    st.html("<div style='height: 12px;'></div>")
 
     # 2. Decision Rule Protocol
-    st.markdown("<p style='font-weight: 600; font-size: 15px; margin-bottom: 4px;'>2. Decision rule protocol</p>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 14px;'>Pre-commit to stopping rules and rollout criteria before deploying traffic.</p>", unsafe_allow_html=True)
+    st.html("<p style='font-weight: 600; font-size: 15px; margin-bottom: 4px;'>2. Decision rule protocol</p><p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 14px;'>Pre-commit to stopping rules and rollout criteria before deploying traffic.</p>")
 
     rule_col1, rule_col2, rule_col3 = st.columns(3, gap="medium")
     with rule_col1:
-        st.markdown(
-            f"""
-            <div style="background: {COLOR_SURFACE}; border: 1px solid {COLOR_BORDER}; padding: 14px; height: 100%;">
-                <div style="font-weight: 600; font-size: 13px; color: #0E5A6B; margin-bottom: 6px;">Ship to 100% (Rollout)</div>
-                <div style="font-size: 12px; color: {COLOR_MUTED_INK}; line-height: 1.5;">
-                    - P-value < 0.05 with positive lift.<br>
-                    - Confidence interval lower bound > 0.<br>
-                    - Net expected return exceeds ₹15 contact cost.<br>
-                    - Operational SLA maintained across outreach channels.
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
+        st.html(
+            f'<div style="background: {COLOR_SURFACE}; border: 1px solid {COLOR_BORDER}; padding: 14px; height: 100%;">'
+            f'<div style="font-weight: 600; font-size: 13px; color: #0E5A6B; margin-bottom: 6px;">Ship to 100% (Rollout)</div>'
+            f'<div style="font-size: 12px; color: {COLOR_MUTED_INK}; line-height: 1.5;">'
+            f'- P-value &lt; 0.05 with positive lift.<br>'
+            f'- Confidence interval lower bound &gt; 0.<br>'
+            f'- Net expected return exceeds ₹15 contact cost.<br>'
+            f'- Operational SLA maintained across outreach channels.'
+            f'</div>'
+            f'</div>'
         )
 
     with rule_col2:
-        st.markdown(
-            f"""
-            <div style="background: {COLOR_SURFACE}; border: 1px solid {COLOR_BORDER}; padding: 14px; height: 100%;">
-                <div style="font-weight: 600; font-size: 13px; color: #B7791F; margin-bottom: 6px;">Iterate Variant (Modify)</div>
-                <div style="font-size: 12px; color: {COLOR_MUTED_INK}; line-height: 1.5;">
-                    - 0.05 <= P-value < 0.20 with directionally positive lift.<br>
-                    - Qualitative feedback indicates user message relevance.<br>
-                    - Re-evaluate messaging copy, timing, or delivery channel before re-running.
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
+        st.html(
+            f'<div style="background: {COLOR_SURFACE}; border: 1px solid {COLOR_BORDER}; padding: 14px; height: 100%;">'
+            f'<div style="font-weight: 600; font-size: 13px; color: #B7791F; margin-bottom: 6px;">Iterate Variant (Modify)</div>'
+            f'<div style="font-size: 12px; color: {COLOR_MUTED_INK}; line-height: 1.5;">'
+            f'- 0.05 &le; P-value &lt; 0.20 with directionally positive lift.<br>'
+            f'- Qualitative feedback indicates user message relevance.<br>'
+            f'- Re-evaluate messaging copy, timing, or delivery channel before re-running.'
+            f'</div>'
+            f'</div>'
         )
 
     with rule_col3:
-        st.markdown(
-            f"""
-            <div style="background: {COLOR_SURFACE}; border: 1px solid {COLOR_BORDER}; padding: 14px; height: 100%;">
-                <div style="font-weight: 600; font-size: 13px; color: #A63D40; margin-bottom: 6px;">Abandon (Rollback)</div>
-                <div style="font-size: 12px; color: {COLOR_MUTED_INK}; line-height: 1.5;">
-                    - P-value >= 0.20 or negative lift.<br>
-                    - Net expected return after contact cost <= 0.<br>
-                    - Unsubscribe or complaint rate exceeds 1.5%.<br>
-                    - Halt intervention and archive test.
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
+        st.html(
+            f'<div style="background: {COLOR_SURFACE}; border: 1px solid {COLOR_BORDER}; padding: 14px; height: 100%;">'
+            f'<div style="font-weight: 600; font-size: 13px; color: #A63D40; margin-bottom: 6px;">Abandon (Rollback)</div>'
+            f'<div style="font-size: 12px; color: {COLOR_MUTED_INK}; line-height: 1.5;">'
+            f'- P-value &ge; 0.20 or negative lift.<br>'
+            f'- Net expected return after contact cost &le; 0.<br>'
+            f'- Unsubscribe or complaint rate exceeds 1.5%.<br>'
+            f'- Halt intervention and archive test.'
+            f'</div>'
+            f'</div>'
         )
 
-    st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
+    st.html("<div style='height: 20px;'></div>")
 
     # 3. Two-Proportion Test Read-Out
-    st.markdown("<p style='font-weight: 600; font-size: 15px; margin-bottom: 4px;'>3. Experiment result read-out</p>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 16px;'>Evaluate trial results with a two-sample two-sided hypothesis test.</p>", unsafe_allow_html=True)
+    st.html("<p style='font-weight: 600; font-size: 15px; margin-bottom: 4px;'>3. Experiment result read-out</p><p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 16px;'>Evaluate trial results with a two-sample two-sided hypothesis test.</p>")
 
     t1, t2, t3, t4 = st.columns(4)
     with t1:

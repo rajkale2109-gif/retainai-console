@@ -91,7 +91,7 @@ def render() -> None:
         mime="text/csv",
     )
 
-    st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+    st.html("<div style='height: 8px;'></div>")
 
     # Display Ranked Table
     display_df = filtered_df[
@@ -123,18 +123,17 @@ def render() -> None:
 
     st.dataframe(
         display_df.head(100),
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
         height=340,
     )
     if total_matched > 100:
-        st.markdown(f"<p style='color: {COLOR_MUTED_INK}; font-size: 11px; margin-top: 4px;'>Showing top 100 of {total_matched:,} users. Export CSV to download the complete queue.</p>", unsafe_allow_html=True)
+        st.html(f"<p style='color: {COLOR_MUTED_INK}; font-size: 11px; margin-top: 4px;'>Showing top 100 of {total_matched:,} users. Export CSV to download the complete queue.</p>")
 
-    st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
+    st.html("<div style='height: 16px;'></div>")
 
     # Per-User Reason and Message Inspection
-    st.markdown("<p style='font-weight: 600; font-size: 15px; margin-bottom: 2px;'>Inspect individual user</p>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>Review risk factors and personalized intervention copy for any selected user.</p>", unsafe_allow_html=True)
+    st.html("<p style='font-weight: 600; font-size: 15px; margin-bottom: 2px;'>Inspect individual user</p><p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>Review risk factors and personalized intervention copy for any selected user.</p>")
 
     if total_matched > 0:
         candidate_ids = filtered_df["user_id"].head(500).tolist()
@@ -145,41 +144,39 @@ def render() -> None:
         u_col1, u_col2 = st.columns([1, 1], gap="medium")
 
         with u_col1:
-            st.markdown(
-                f"""
-                <div style="background: {COLOR_SURFACE}; border: 1px solid {COLOR_BORDER}; padding: 16px;">
-                    <div style="font-weight: 600; font-size: 13px; margin-bottom: 8px;">User profile & diagnostics</div>
-                    <div style="font-size: 12px; margin-bottom: 4px;"><strong>User ID:</strong> {user_row['user_id']}</div>
-                    <div style="font-size: 12px; margin-bottom: 4px;"><strong>Signup date:</strong> {user_row['signup_date']}</div>
-                    <div style="font-size: 12px; margin-bottom: 4px;"><strong>Segment:</strong> {user_row['segment']}</div>
-                    <div style="font-size: 12px; margin-bottom: 4px;"><strong>Acquisition channel:</strong> {user_row['acquisition_channel']}</div>
-                    <div style="font-size: 12px; margin-bottom: 4px;"><strong>Predicted dormancy risk:</strong> {user_row['predicted_risk'] * 100:.1f}%</div>
-                    <div style="font-size: 12px;"><strong>Net expected value:</strong> {format_rupees(user_row['expected_value'])}</div>
-                    <div style="margin-top: 12px; font-weight: 600; font-size: 12px; color: {COLOR_MUTED_INK};">Key risk drivers (days 0-14):</div>
-                    <ul style="margin: 4px 0 0 16px; padding: 0; font-size: 12px;">
-                        <li>{user_row['top_reason_1']}</li>
-                        <li>{user_row['top_reason_2']}</li>
-                        <li>{user_row['top_reason_3']}</li>
-                    </ul>
-                </div>
-                """,
-                unsafe_allow_html=True,
+            u_diag_html = (
+                f'<div style="background: {COLOR_SURFACE}; border: 1px solid {COLOR_BORDER}; padding: 16px;">'
+                f'<div style="font-weight: 600; font-size: 13px; margin-bottom: 8px;">User profile & diagnostics</div>'
+                f'<div style="font-size: 12px; margin-bottom: 4px;"><strong>User ID:</strong> {user_row["user_id"]}</div>'
+                f'<div style="font-size: 12px; margin-bottom: 4px;"><strong>Signup date:</strong> {user_row["signup_date"]}</div>'
+                f'<div style="font-size: 12px; margin-bottom: 4px;"><strong>Segment:</strong> {user_row["segment"]}</div>'
+                f'<div style="font-size: 12px; margin-bottom: 4px;"><strong>Acquisition channel:</strong> {user_row["acquisition_channel"]}</div>'
+                f'<div style="font-size: 12px; margin-bottom: 4px;"><strong>Predicted dormancy risk:</strong> {user_row["predicted_risk"] * 100:.1f}%</div>'
+                f'<div style="font-size: 12px;"><strong>Net expected value:</strong> {format_rupees(user_row["expected_value"])}</div>'
+                f'<div style="margin-top: 12px; font-weight: 600; font-size: 12px; color: {COLOR_MUTED_INK};">Key risk drivers (days 0-14):</div>'
+                f'<ul style="margin: 4px 0 0 16px; padding: 0; font-size: 12px;">'
+                f'<li>{user_row["top_reason_1"]}</li>'
+                f'<li>{user_row["top_reason_2"]}</li>'
+                f'<li>{user_row["top_reason_3"]}</li>'
+                f'</ul>'
+                f'</div>'
             )
+            st.html(u_diag_html)
 
         with u_col2:
-            st.markdown(
-                f"""
-                <div style="background: {COLOR_SURFACE}; border: 1px solid {COLOR_BORDER}; padding: 16px;">
-                    <div style="font-weight: 600; font-size: 13px; margin-bottom: 8px;">Recommended playbook intervention</div>
-                    <div style="font-size: 12px; margin-bottom: 4px;"><strong>Action:</strong> {user_row['recommended_action']}</div>
-                    <div style="font-size: 12px; margin-bottom: 4px;"><strong>Delivery channel:</strong> {user_row['recommended_channel']}</div>
-                    <div style="font-size: 12px; margin-bottom: 4px;"><strong>Assumed save rate:</strong> {user_row['save_rate'] * 100:.1f}% | <strong>LTV:</strong> {format_rupees(user_row['lifetime_value'])}</div>
-                    <div style="font-size: 12px; margin-bottom: 12px;"><strong>Contact recommendation:</strong> <span style="font-weight: 600; color: {'#0E5A6B' if user_row['should_contact'] else '#A63D40'};">{'Proceed (EV > 0)' if user_row['should_contact'] else 'Do not contact (EV <= 0)'}</span></div>
-                    <div style="font-weight: 600; font-size: 12px; color: {COLOR_MUTED_INK}; margin-bottom: 4px;">Outreach message template:</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
+            contact_color = "#0E5A6B" if user_row["should_contact"] else "#A63D40"
+            contact_text = "Proceed (EV > 0)" if user_row["should_contact"] else "Do not contact (EV <= 0)"
+            u_play_html = (
+                f'<div style="background: {COLOR_SURFACE}; border: 1px solid {COLOR_BORDER}; padding: 16px;">'
+                f'<div style="font-weight: 600; font-size: 13px; margin-bottom: 8px;">Recommended playbook intervention</div>'
+                f'<div style="font-size: 12px; margin-bottom: 4px;"><strong>Action:</strong> {user_row["recommended_action"]}</div>'
+                f'<div style="font-size: 12px; margin-bottom: 4px;"><strong>Delivery channel:</strong> {user_row["recommended_channel"]}</div>'
+                f'<div style="font-size: 12px; margin-bottom: 4px;"><strong>Assumed save rate:</strong> {user_row["save_rate"] * 100:.1f}% | <strong>LTV:</strong> {format_rupees(user_row["lifetime_value"])}</div>'
+                f'<div style="font-size: 12px; margin-bottom: 12px;"><strong>Contact recommendation:</strong> <span style="font-weight: 600; color: {contact_color};">{contact_text}</span></div>'
+                f'<div style="font-weight: 600; font-size: 12px; color: {COLOR_MUTED_INK}; margin-bottom: 4px;">Outreach message template:</div>'
+                f'</div>'
             )
+            st.html(u_play_html)
             render_callout(f'"{user_row["recommended_message"]}"', tone="neutral")
     else:
         st.info("No users match the selected filters.")
