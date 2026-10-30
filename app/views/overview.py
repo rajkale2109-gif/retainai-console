@@ -129,6 +129,12 @@ def render() -> None:
             apply_chart_theme(fig_timing, height=320)
             st.plotly_chart(fig_timing, use_container_width=True, config={"displayModeBar": False})
 
+    # Funnel and trading velocity diagnostic callout
+    render_callout(
+        f"Funnel bottleneck analysis: The steepest user drop occurs between KYC and funding, where {100.0 - fund_pct:.1f}% of verified accounts never deposit funds. Among funded accounts, {100.0 - trade_pct:.1f}% fail to trade within 30 days. Fast activation is critical: users placing their first trade within 7 days exhibit only ~15% dormancy, compared to 46.9% for never-traded accounts.",
+        tone="neutral",
+    )
+
     st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
 
     # 3. Monthly Cohort Retention Heatmap

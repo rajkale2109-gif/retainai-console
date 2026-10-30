@@ -24,9 +24,27 @@ def render() -> None:
     st.markdown("<p style='font-weight: 600; font-size: 15px; margin-bottom: 4px;'>1. Sample-size calculator</p>", unsafe_allow_html=True)
     st.markdown("<p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 16px;'>Determine the statistical power and sample size required to validate an intervention before rollout.</p>", unsafe_allow_html=True)
 
+    preset_col, _ = st.columns([1.5, 2.5])
+    with preset_col:
+        preset = st.selectbox(
+            "Preload segment assumptions",
+            ["Custom", "Hesitant (24% save rate)", "Burned (18% save rate)", "Browser (15% save rate)", "Unfunded (8% save rate)", "Monitor (4% save rate)"],
+            index=1,
+        )
+
+    preset_rates = {
+        "Custom": 18.0,
+        "Hesitant (24% save rate)": 24.0,
+        "Burned (18% save rate)": 18.0,
+        "Browser (15% save rate)": 15.0,
+        "Unfunded (8% save rate)": 8.0,
+        "Monitor (4% save rate)": 4.0,
+    }
+    initial_base = preset_rates[preset]
+
     c1, c2, c3, c4 = st.columns(4)
     with c1:
-        base_rate_pct = st.slider("Baseline save rate (%)", min_value=5.0, max_value=40.0, value=18.0, step=1.0)
+        base_rate_pct = st.slider("Baseline save rate (%)", min_value=2.0, max_value=40.0, value=initial_base, step=1.0)
     with c2:
         mde_pct = st.slider("Target relative lift / MDE (%)", min_value=5.0, max_value=50.0, value=15.0, step=1.0)
     with c3:

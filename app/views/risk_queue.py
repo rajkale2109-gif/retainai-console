@@ -39,7 +39,7 @@ def render() -> None:
         selected_channel = st.selectbox("Acquisition channel", channels, index=0)
 
     with filter_col3:
-        min_risk = st.slider("Minimum predicted risk", min_value=0.0, max_value=1.0, value=0.35, step=0.05)
+        min_risk = st.slider("Minimum predicted risk", min_value=0.0, max_value=1.0, value=0.0, step=0.05)
 
     # Apply Filters
     filtered_df = scores_df.copy()
@@ -137,7 +137,7 @@ def render() -> None:
     st.markdown("<p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>Review risk factors and personalized intervention copy for any selected user.</p>", unsafe_allow_html=True)
 
     if total_matched > 0:
-        candidate_ids = filtered_df["user_id"].head(50).tolist()
+        candidate_ids = filtered_df["user_id"].head(500).tolist()
         inspect_id = st.selectbox("Select user ID to inspect", candidate_ids, index=0)
 
         user_row = filtered_df[filtered_df["user_id"] == inspect_id].iloc[0]
