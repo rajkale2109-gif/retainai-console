@@ -4,6 +4,14 @@ Main Streamlit application entry point.
 Groups navigation into Monitor, Plan, and Evaluate.
 """
 
+import sys
+from pathlib import Path
+
+# Ensure workspace root is in sys.path when running `streamlit run app/main.py`
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
 import streamlit as st
 
 from app.ui import inject_global_styles, render_empty_state
