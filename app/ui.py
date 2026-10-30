@@ -243,6 +243,33 @@ div[data-testid="stDataFrame"] {{
     background-color: var(--color-panel) !important;
 }}
 
+/* Segmented Control Styling */
+div[data-testid="stSegmentedControl"] {{
+    background-color: var(--color-panel) !important;
+    border: 1px solid var(--color-border) !important;
+    border-radius: 4px !important;
+    padding: 3px !important;
+}}
+div[data-testid="stSegmentedControl"] button {{
+    border: none !important;
+    border-radius: 3px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    color: var(--color-text-muted) !important;
+    background-color: transparent !important;
+    transition: background-color 0.15s ease, color 0.15s ease !important;
+}}
+div[data-testid="stSegmentedControl"] button:hover {{
+    color: var(--color-text-primary) !important;
+    background-color: var(--color-raised) !important;
+}}
+div[data-testid="stSegmentedControl"] button[aria-checked="true"],
+div[data-testid="stSegmentedControl"] button[data-checked="true"] {{
+    background-color: var(--color-accent) !important;
+    color: #FFFFFF !important;
+    font-weight: 600 !important;
+}}
+
 /* Primary Buttons */
 .stButton > button {{
     background-color: var(--color-accent) !important;
@@ -361,8 +388,12 @@ def render_sidebar_rail() -> str:
         f'</div>'
     )
 
+    param_page = st.query_params.get("page")
+    if param_page:
+        st.session_state["current_nav_page"] = param_page
+
     if "current_nav_page" not in st.session_state:
-        st.session_state["current_nav_page"] = st.query_params.get("page", "Overview")
+        st.session_state["current_nav_page"] = "Overview"
 
     current_page = st.session_state["current_nav_page"]
 

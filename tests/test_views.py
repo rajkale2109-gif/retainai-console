@@ -1,11 +1,13 @@
-"""Smoke tests for all 5 app page views."""
+"""Integration and smoke tests for all 5 app page views using Streamlit AppTest."""
 
+from pathlib import Path
 import pytest
-from unittest.mock import patch
-import pandas as pd
+from streamlit.testing.v1 import AppTest
 
 from app.views import overview, risk_queue, segments_playbook, experiment_planner, model_threshold
 from app.data import get_scores, get_metrics, get_funnel, get_retention_cohorts, get_time_to_first_trade
+
+MAIN_PY = str(Path(__file__).resolve().parent.parent / "app" / "main.py")
 
 
 def test_data_loaders_return_valid_data():
@@ -31,9 +33,23 @@ def test_data_loaders_return_valid_data():
     assert "time_bucket" in timing.columns
 
 
-def test_views_execute_without_uncaught_exceptions():
-    """Smoke test: render all 5 views with patched streamlit primitives."""
-    # Under pytest, verify that each module has a callable render function
+def test_views_have_render_functions():
+    """Verify that each page module exposes a callable render function."""
     for module in [overview, risk_queue, segments_playbook, experiment_planner, model_threshold]:
         assert hasattr(module, "render")
         assert callable(module.render)
+
+
+@pytest.mark.parametrize("page_name", [
+    "overview",
+    "risk_queue",
+    "segments_playbook",
+    "experiment_planner",
+    "model_threshold",
+])
+def test_apptest_renders_each_page_without_exceptions(page_name: str):
+    """Render each page in Streamlit AppTest harness and verify zero unhandled exceptions."""
+    at = AppTest.from_file(MAIN_PY)
+    at.session_state["active_page"] = page_name
+    at.run(timeout=30)
+    assert len(at.exception) == 0, f"Page {page_name} raised exceptions: {[e.value for e in at.exception]}"

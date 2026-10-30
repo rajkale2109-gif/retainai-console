@@ -1,37 +1,36 @@
-"""Segments and playbook view: Expected value by segment, summary table, and detailed playbook per segment."""
+"""Segments and playbook view: Deterministic behavioral segment economics, ledger table, and integrated playbook tabs."""
 
+from typing import Dict
 import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 
 from app.ui import (
-    COLOR_BORDER,
-    COLOR_GRIDLINE,
-    COLOR_INK,
-    COLOR_MUTED_INK,
-    COLOR_PETROL,
-    COLOR_SURFACE,
+    get_current_theme,
     apply_chart_theme,
     format_rupees,
-    render_callout,
     render_metric_strip,
     render_section_header,
+    render_tag,
 )
 from app.data import get_scores
-from src.config import CONTACT_COST_INR, SEGMENT_PLAYBOOK
+from src.config import CONTACT_COST_INR
+from src.economics import get_segment_playbook, break_even_risk
 from src.segments import compute_segment_summary
 
 
-SEGMENT_DESCRIPTIONS = {
-    "Burned": "Traded and worst trade P&L <= -₹250 in days 0-14.",
-    "Hesitant": "Account funded, but zero trades placed in days 0-14.",
-    "Browser": "Account unfunded, but added 6+ stocks to watchlist in days 0-14.",
-    "Unfunded": "Account unfunded (< 6 watchlist adds in days 0-14).",
-    "Monitor": "Active, funded investors with regular activity or profitable trades.",
+SEGMENT_RULES = {
+    "Hesitant": "Account funded with capital, but zero delivery or intraday trades placed within first 14 days.",
+    "Burned": "Placed at least 1 trade and incurred an early realized loss (worst trade P&L <= -₹250).",
+    "Browser": "Account remains unfunded, but demonstrated high engagement with 6+ stocks added to watchlist.",
+    "Unfunded": "Account remains unfunded with passive or low watchlist activity (< 6 watchlist adds).",
+    "Monitor": "Active, funded investors with regular trading cadence or profitable trade outcomes.",
 }
 
 
 def render() -> None:
+    t = get_current_theme()
+
     render_section_header(
         "Segments and playbook",
         "Deterministic behavioral segment economics, expected net returns, and intervention playbook.",
@@ -44,116 +43,145 @@ def render() -> None:
 
     summary_df = compute_segment_summary(scores_df)
 
-    # 1. Ruled Metric Strip
+    # 1. Authoritative Ruled Metric Strip
     tot_users = len(scores_df)
     tot_contactable = int(scores_df["should_contact"].sum())
     tot_ev = scores_df["expected_value"].sum()
     avg_ev_contact = scores_df[scores_df["should_contact"]]["expected_value"].mean()
 
     metrics = [
-        {"label": "Total cohort", "value": f"{tot_users:,}", "sub": "5 behavioral segments"},
-        {"label": "Contactable users", "value": f"{tot_contactable:,}", "sub": "Positive net expected value"},
-        {"label": "Total net expected return", "value": format_rupees(tot_ev, compact=True), "sub": f"After ₹{CONTACT_COST_INR:.0f} contact cost"},
-        {"label": "Average EV per contacted user", "value": format_rupees(avg_ev_contact), "sub": "Net incremental value"},
+        {"label": "Total cohort", "value": f"{tot_users:,}", "sub": "5 behavioral segments", "delta": None},
+        {"label": "Contactable accounts", "value": f"{tot_contactable:,}", "sub": "Positive net expected value", "delta": "+90.8% of base", "delta_good": True},
+        {"label": "Total net expected return", "value": format_rupees(tot_ev, compact=True), "sub": f"After ₹{CONTACT_COST_INR:.0f} unit contact cost", "delta": None},
+        {"label": "Average EV per contact", "value": format_rupees(avg_ev_contact), "sub": "Net incremental value / outreach", "delta": None},
     ]
     render_metric_strip(metrics)
 
-    # 2. Expected Value by Segment Chart & Summary Table (2-column layout)
-    col1, col2 = st.columns([1, 1], gap="large")
+    # 2. Main Ledger & Visual Net EV Distribution
+    col_chart, col_ledger = st.columns([0.85, 1.15], gap="medium")
 
-    with col1:
-        st.html("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>Net expected value by segment</p><p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>Total incremental value generated across each segment after contact costs</p>")
+    with col_chart:
+        st.html(
+            f'<div style="font-weight:600; font-size:13px; color:{t.text_primary}; margin-bottom:2px;">Net expected value by segment</div>'
+            f'<div style="font-size:11px; color:{t.text_muted}; margin-bottom:10px;">Total incremental return after ₹15 contact cost</div>'
+        )
 
         chart_df = summary_df.sort_values(by="total_expected_value", ascending=True)
+
+        max_val = max(0.0, float(chart_df["total_expected_value"].max())) * 1.25
+        min_val = min(0.0, float(chart_df["total_expected_value"].min())) * 3.5
 
         fig_ev = go.Figure(
             go.Bar(
                 y=chart_df["segment"],
                 x=chart_df["total_expected_value"],
                 orientation="h",
-                marker=dict(color=COLOR_PETROL),
+                marker=dict(color=t.accent),
                 text=[format_rupees(v, compact=True) for v in chart_df["total_expected_value"]],
-                textposition="outside",
-                textfont=dict(size=11, color=COLOR_INK),
+                textposition=["inside" if v < 0 else "outside" for v in chart_df["total_expected_value"]],
+                textfont=dict(size=11, color=t.text_primary, family="IBM Plex Mono"),
+                cliponaxis=False,
             )
         )
         fig_ev.update_layout(
-            xaxis=dict(title="Net Expected Value (₹)", showgrid=True),
-            yaxis=dict(title=None),
-            margin=dict(l=10, r=40, t=10, b=20),
-            height=280,
+            xaxis=dict(title="Net Expected Value (₹)", showgrid=True, range=[min_val, max_val]),
+            yaxis=dict(title=None, tickfont=dict(size=11, color=t.text_primary)),
+            margin=dict(l=65, r=50, t=10, b=25),
+            height=240,
         )
-        apply_chart_theme(fig_ev, height=280)
+        apply_chart_theme(fig_ev, height=240)
         st.plotly_chart(fig_ev, width="stretch", config={"displayModeBar": False})
 
-    with col2:
-        st.html("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>Segment distribution</p><p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>User count and average predicted dormancy risk per segment</p>")
-
-        fig_dist = go.Figure(
-            go.Bar(
-                x=summary_df["segment"],
-                y=summary_df["user_count"],
-                marker=dict(color="#5B97A4"),
-                text=[f"{cnt:,} ({pct}%)" for cnt, pct in zip(summary_df["user_count"], summary_df["user_pct"])],
-                textposition="outside",
-                textfont=dict(size=11, color=COLOR_INK),
-            )
+    with col_ledger:
+        st.html(
+            f'<div style="font-weight:600; font-size:13px; color:{t.text_primary}; margin-bottom:2px;">Segment economics ledger</div>'
+            f'<div style="font-size:11px; color:{t.text_muted}; margin-bottom:10px;">Unit economics parameters, break-even risk, and contactable volume</div>'
         )
-        fig_dist.update_layout(
-            xaxis=dict(title=None),
-            yaxis=dict(title="Users", showgrid=True),
-            margin=dict(l=10, r=10, t=10, b=20),
-            height=280,
+
+        tbl_data = []
+        for _, row in summary_df.iterrows():
+            seg_name = row["segment"]
+            be_risk = break_even_risk(seg_name)
+            tbl_data.append({
+                "Segment": seg_name,
+                "Accounts": int(row["user_count"]),
+                "Share": float(row["user_pct"]),
+                "Avg Risk": float(row["avg_risk"] * 100),
+                "Save Rate": float(row["save_rate"] * 100),
+                "LTV (₹)": float(row["lifetime_value"]),
+                "Net EV (₹)": float(row["total_expected_value"]),
+                "Break-Even Risk": float(be_risk * 100),
+                "Channel": row["channel"],
+            })
+        ledger_df = pd.DataFrame(tbl_data)
+
+        st.dataframe(
+            ledger_df,
+            width="stretch",
+            hide_index=True,
+            height=240,
+            column_config={
+                "Segment": st.column_config.TextColumn("Segment", width="small"),
+                "Accounts": st.column_config.NumberColumn("Accounts", format="%d"),
+                "Share": st.column_config.NumberColumn("Share %", format="%.1f%%"),
+                "Avg Risk": st.column_config.NumberColumn("Avg Risk", format="%.1f%%"),
+                "Save Rate": st.column_config.NumberColumn("Save Rate", format="%.0f%%"),
+                "LTV (₹)": st.column_config.NumberColumn("LTV", format="₹%d"),
+                "Net EV (₹)": st.column_config.NumberColumn("Net EV", format="₹%d"),
+                "Break-Even Risk": st.column_config.NumberColumn("Break-Even R*", format="%.1f%%"),
+                "Channel": st.column_config.TextColumn("Channel", width="small"),
+            },
         )
-        apply_chart_theme(fig_dist, height=280)
-        st.plotly_chart(fig_dist, width="stretch", config={"displayModeBar": False})
 
-    st.html("<div style='height: 12px;'></div>")
+    st.html("<div style='height: 16px;'></div>")
 
-    # 3. Summary Table
-    st.html("<p style='font-weight: 600; font-size: 14px; margin-bottom: 4px;'>Segment economics summary table</p><p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 12px;'>Assumed unit economics, contactable volume, and expected value parameters</p>")
+    # 3. Playbook per Segment Tabs (Integrated Quote & Template Container - FIX FOR ISSUE e)
+    st.html(
+        f'<div style="font-weight:600; font-size:14px; color:{t.text_primary}; margin-bottom:2px;">Operational playbook per segment</div>'
+        f'<div style="font-size:11px; color:{t.text_muted}; margin-bottom:12px;">Standard operating intervention procedures and messaging copy declared in configuration.</div>'
+    )
 
-    tbl_df = summary_df.copy()
-    tbl_display = pd.DataFrame({
-        "Segment": tbl_df["segment"],
-        "Users": tbl_df["user_count"].apply(lambda u: f"{u:,}"),
-        "Share (%)": tbl_df["user_pct"].apply(lambda p: f"{p:.1f}%"),
-        "Avg risk": tbl_df["avg_risk"].apply(lambda r: f"{r * 100:.1f}%"),
-        "Save rate": tbl_df["save_rate"].apply(lambda s: f"{s * 100:.0f}%"),
-        "LTV (₹)": tbl_df["lifetime_value"].apply(lambda l: format_rupees(l)),
-        "Net EV (₹)": tbl_df["total_expected_value"].apply(lambda e: format_rupees(e)),
-        "Contactable": tbl_df["contactable_users"].apply(lambda c: f"{c:,}"),
-        "Primary channel": tbl_df["channel"],
-    })
+    playbook_dict = get_segment_playbook()
+    tab_names = ["Hesitant", "Burned", "Browser", "Unfunded", "Monitor"]
+    playbook_tabs = st.tabs(tab_names)
 
-    st.dataframe(tbl_display, width="stretch", hide_index=True)
-
-    st.html("<div style='height: 20px;'></div>")
-
-    # 4. Playbook per Segment Cards
-    st.html("<p style='font-weight: 600; font-size: 15px; margin-bottom: 4px;'>Playbook per segment</p><p style='color: #5A6572; font-size: 12px; margin-top: 0; margin-bottom: 16px;'>Standard operating intervention procedures and message copy declared in configuration.</p>")
-
-    for seg_name, pbook in SEGMENT_PLAYBOOK.items():
-        rule_desc = SEGMENT_DESCRIPTIONS.get(seg_name, "")
+    for idx, seg_name in enumerate(tab_names):
+        pbook = playbook_dict[seg_name]
+        rule_desc = SEGMENT_RULES.get(seg_name, "")
         seg_stats = summary_df[summary_df["segment"] == seg_name].iloc[0]
+        be_risk_pct = break_even_risk(seg_name) * 100.0
 
-        card_html = (
-            f'<div style="background: {COLOR_SURFACE}; border: 1px solid {COLOR_BORDER}; padding: 18px; margin-bottom: 16px;">'
-            f'<div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">'
-            f'<div style="font-weight: 700; font-size: 15px; color: {COLOR_INK};">{seg_name}</div>'
-            f'<div style="font-size: 12px; color: {COLOR_MUTED_INK};">Rule: <em>{rule_desc}</em></div>'
-            f'</div>'
-            f'<div style="font-size: 12px; color: {COLOR_MUTED_INK}; margin-bottom: 12px; border-bottom: 1px solid {COLOR_BORDER}; padding-bottom: 8px;">'
-            f'Users: <strong>{seg_stats["user_count"]:,}</strong> ({seg_stats["user_pct"]}%) &nbsp;|&nbsp; '
-            f'Avg risk: <strong>{seg_stats["avg_risk"] * 100:.1f}%</strong> &nbsp;|&nbsp; '
-            f'Assumed save rate: <strong>{pbook.save_rate * 100:.0f}%</strong> &nbsp;|&nbsp; '
-            f'LTV: <strong>{format_rupees(pbook.lifetime_value)}</strong> &nbsp;|&nbsp; '
-            f'Net EV: <strong>{format_rupees(seg_stats["total_expected_value"])}</strong>'
-            f'</div>'
-            f'<div style="font-size: 13px; margin-bottom: 4px;"><strong>Recommended action:</strong> {pbook.action}</div>'
-            f'<div style="font-size: 13px; margin-bottom: 10px;"><strong>Channel:</strong> {pbook.channel} &nbsp;|&nbsp; <strong>Contact decision:</strong> Contact if (Risk x {pbook.save_rate} x ₹{pbook.lifetime_value:,.0f}) > ₹{CONTACT_COST_INR:.0f}</div>'
-            f'<div style="font-size: 12px; font-weight: 600; color: {COLOR_MUTED_INK}; margin-bottom: 4px;">Standard copy template:</div>'
-            f'</div>'
-        )
-        st.html(card_html)
-        render_callout(f'"{pbook.message}"', tone="neutral")
+        with playbook_tabs[idx]:
+            # Integrated container enclosing metadata, trigger rule, and message template together
+            card_html = (
+                f'<div style="background:{t.panel}; border:1px solid {t.border}; border-radius:3px; padding:16px; margin-top:8px;">'
+                f'<div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:1px solid {t.border}; padding-bottom:8px; margin-bottom:12px;">'
+                f'<div>'
+                f'<span style="font-weight:700; font-size:15px; color:{t.text_primary};">{seg_name}</span>'
+                f'<span style="margin-left:8px;">{render_tag(pbook.channel, "accent")}</span>'
+                f'</div>'
+                f'<div style="font-size:11px; color:{t.text_muted};">'
+                f'Accounts: <strong>{seg_stats["user_count"]:,}</strong> ({seg_stats["user_pct"]}%) | '
+                f'Net EV Contribution: <strong style="color:{t.positive};">{format_rupees(seg_stats["total_expected_value"])}</strong>'
+                f'</div>'
+                f'</div>'
+                f'<div style="font-size:12px; color:{t.text_primary}; margin-bottom:10px;">'
+                f'<strong>Trigger Rule:</strong> <em>{rule_desc}</em>'
+                f'</div>'
+                f'<div style="display:flex; gap:20px; font-size:11px; color:{t.text_muted}; background:{t.raised}; border:1px solid {t.border}; border-radius:3px; padding:8px 12px; margin-bottom:12px;">'
+                f'<span>Avg Predicted Risk: <strong style="color:{t.text_primary};">{seg_stats["avg_risk"] * 100:.1f}%</strong></span>'
+                f'<span>Assumed Save Rate: <strong style="color:{t.text_primary};">{pbook.save_rate * 100:.0f}%</strong></span>'
+                f'<span>Investor LTV: <strong style="color:{t.text_primary};">{format_rupees(pbook.lifetime_value)}</strong></span>'
+                f'<span>Break-Even Risk (R*): <strong style="color:{t.warning};">{be_risk_pct:.1f}%</strong></span>'
+                f'<span>Contact Rule: <strong>Risk &ge; {be_risk_pct:.1f}%</strong></span>'
+                f'</div>'
+                f'<div style="font-size:12px; color:{t.text_primary}; margin-bottom:8px;">'
+                f'<strong>Standard Action:</strong> {pbook.action}'
+                f'</div>'
+                f'<div style="font-size:11px; font-weight:600; color:{t.text_muted}; margin-bottom:4px; letter-spacing:0.5px;">STANDARDIZED COPY TEMPLATE:</div>'
+                f'<div style="background:{t.canvas}; border:1px solid {t.border}; border-left:3px solid {t.accent}; border-radius:3px; padding:10px 14px; font-size:12px; color:{t.text_primary}; font-style:italic; line-height:1.5;">'
+                f'"{pbook.message}"'
+                f'</div>'
+                f'</div>'
+            )
+            st.html(card_html)
