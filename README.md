@@ -1,140 +1,118 @@
 # RetainAI: Retail Broking Retention Console
 
-## What It Is
-RetainAI is an early intervention and retention intelligence console built for retail broking platforms. It predicts which newly onboarded retail investors are likely to become dormant, diagnoses the behavioral drivers behind their drop-off using only their first 14 days of app activity, and prescribes targeted, positive-ROI interventions.
-
-## The Core Product Question
-> **"Which new investors will go dormant between Day 61 and Day 90 after signup, why are they disengaging, and what specific intervention can we deploy on Day 14 that delivers a positive net expected return?"**
-
-In retail investing, dormancy early in the customer lifecycle severely depresses customer lifetime value (LTV). Waiting until Day 60 to detect churn is too late; by Day 14, user behavioral intent has solidified, creating an optimal window for intervention.
+Institutional trading terminal and retention triage console for retail brokerage operations. Built for retention PMs and CRM analysts monitoring new investor activation, early disengagement, and day-14 risk interventions.
 
 ---
 
-## Key Definitions & Business Rules
+## Live Access Links
 
-- **Prediction Point**: Day 14 after signup. Features strictly query behavioral events occurring between `signup_date` and `signup_date + 14 days`.
-- **Dormancy Definition**: A user is dormant if they have **0 app logins (sessions) and 0 executed trades** between **Day 61 and Day 90** after signup.
-- **Evaluation Split**: Chronological train/test split. Signups before `2025-10-01` form the training set; signups on or after `2025-10-01` form the hold-out test set.
-- **Unit Economics**:
-  $$\text{Expected Value (EV)} = (\text{Predicted Risk} \times \text{Assumed Save Rate} \times \text{Customer LTV}) - ₹15 \text{ (Contact Cost)}$$
-  **Intervention Rule**: Contact *only* users with positive net expected value ($\text{EV} > 0$).
+- **Instant Public HTTPS Tunnel:** [https://wireless-behavioral-guides-ate.trycloudflare.com](https://wireless-behavioral-guides-ate.trycloudflare.com) *(Cloudflare Tunnel)*
+- **Local Terminal URL:** [http://localhost:8501](http://localhost:8501)
 
 ---
 
-## Behavioral Segments & Playbook
+## Before & After Gallery (Terminal Redesign)
 
-| Segment | Day-14 Classification Rule | Save Rate | Assumed LTV | Channel | Prescribed Action |
-| :--- | :--- | :---: | :---: | :--- | :--- |
-| **Burned** | Traded & worst single trade P&L $\le -₹250$ | 18% | ₹2,200 | RM Call | Risk management walkthrough & stop-loss guidance |
-| **Hesitant** | Account funded, but 0 trades placed | 24% | ₹1,800 | WhatsApp | 3-step first-trade video & curated starter ETF list |
-| **Browser** | Unfunded, but added $\ge 6$ stocks to watchlist | 15% | ₹1,200 | In-app Push | Real-time market alert on tracked stocks with 1-click UPI funding |
-| **Unfunded** | Unfunded and $< 6$ watchlist additions | 8% | ₹800 | SMS | Zero account maintenance charge (AMC) prompt with ₹100 minimum deposit |
-| **Monitor** | Regular active traders or profitable accounts | 4% | ₹1,500 | Email | Weekly curated market intelligence & sector digest |
+| View | Baseline ("Before") | Institutional Terminal ("After") |
+| :--- | :--- | :--- |
+| **Overview (Command Centre)** | ![Before Overview](docs/before/overview_1440x900.png) | ![After Overview](docs/after/overview_1440x900_dark.png) |
+| **Risk Queue (Master & Detail)** | ![Before Risk Queue](docs/before/risk_queue_1440x900.png) | ![After Risk Queue](docs/after/risk_queue_1440x900_dark.png) |
+| **Segments & Playbook** | ![Before Segments](docs/before/segments_playbook_1440x900.png) | ![After Segments](docs/after/segments_playbook_1440x900_dark.png) |
+| **Experiment Planner** | ![Before Planner](docs/before/experiment_planner_1440x900.png) | ![After Planner](docs/after/experiment_planner_1440x900_dark.png) |
+| **Model & Threshold** | ![Before Model](docs/before/model_threshold_1440x900.png) | ![After Model](docs/after/model_threshold_1440x900_dark.png) |
 
----
-
-## Tech Stack
-Built strictly with the mandated libraries:
-- **Language**: Python 3.11+
-- **Database**: SQLite 3 (native `sqlite3`, queries executed via SQL files)
-- **Data & Modeling**: `pandas`, `numpy`, `scikit-learn`, `scipy`
-- **Application & Visualization**: `Streamlit` (>=1.50), `Plotly`
-- **Testing**: `pytest`
+*Full screenshot suites across 1920×1080, 1440×900, and 1280×720 for both Dark and Light themes are cataloged in [`docs/after/`](docs/after/).*
 
 ---
 
-## Folder Layout
-```text
-retainai/
-├── SPEC.md                     # Source of truth specification
-├── requirements.txt            # Python dependencies
-├── .gitignore                  # Git ignore rules
-├── README.md                   # Product documentation and runbook
-├── .streamlit/
-│   └── config.toml             # Theme tokens and server configuration
-├── sql/                        # SQL queries executed exclusively via SQLite
-│   ├── funnel.sql              # Onboarding conversion funnel
-│   ├── retention.sql           # Monthly cohort retention matrix
-│   ├── time_to_first_trade.sql # First trade speed vs. dormancy analysis
-│   ├── features_day14.sql      # Day-14 behavioural feature extraction
-│   └── label_dormancy.sql      # Ground-truth Day 61-90 dormancy calculation
-├── src/
-│   ├── config.py               # Central configuration, unit economics, segment definitions
-│   ├── generate_data.py        # 20,000 user synthetic data generator (seed 42)
-│   ├── build_db.py             # SQLite schema initialization, data population, and validation
-│   ├── features.py             # Feature preprocessing and column encoding
-│   ├── segments.py             # Rule-based segmentation and expected value engine
-│   ├── stats.py                # Sample-size calculator and two-proportion hypothesis testing
-│   ├── train.py                # Baseline & Gradient Boosting models, OOF scoring, permutation importance
-│   └── pipeline.py             # Master orchestrator script
-├── app/
-│   ├── main.py                 # Streamlit entry point with grouped navigation
-│   ├── ui.py                   # Design system tokens, Public Sans CSS, Indian rupee formatting
-│   ├── data.py                 # Cached data access layer
-│   └── views/
-│       ├── overview.py         # Five-figure strip, funnel, retention heatmap, trade timing
-│       ├── risk_queue.py       # Filterable ranked queue, CSV export, user diagnostic inspection
-│       ├── segments_playbook.py# Portfolio EV by segment, economics table, operational playbook
-│       ├── experiment_planner.py# A/B sample-size calculator, stopping rules, two-proportion test
-│       └── model_threshold.py  # Model metrics, drivers, ROC curve, optimal contact threshold
-├── tests/
-│   ├── test_leakage.py         # Day-14 leakage assertion (pruning and injection)
-│   ├── test_segments.py        # Segment assignment and expected value math tests
-│   ├── test_stats.py           # Statistical calculations and hypothesis tests
-│   ├── test_train.py           # Model artifacts and scoring validation
-│   └── test_views.py           # Streamlit view smoke tests
-└── data/                       (git-ignored)
-    ├── raw/retainai.db         # SQLite database
-    └── processed/
-        ├── scores.csv          # 20,000 scored users with out-of-fold risk and recommendations
-        └── metrics.json        # Hold-out evaluation metrics and permutation importances
-```
+## Key Institutional Terminal Capabilities
+
+### 1. Unified Telemetry Shell & Dual Themes
+- **Trading Terminal Aesthetics:** High-density 8px grid, tabular numbers, monospace IDs, and zero decorative gradients or animations. Inspired by Zerodha Kite, Upstox Pro, and Bloomberg Terminal.
+- **Dual Themes:** Default Dark Terminal (`#0E1217` canvas, `#151B23` panel, `#0E8A73` teal accent) and Clean Light Theme (`#F4F5F7` canvas, `#FFFFFF` panel). Instant toggle in top telemetry bar.
+- **Top Telemetry Strip:** Real-time ticker displaying Cohort Period, Prediction Checkpoint (Day 14), Model Version (HistGB), Evaluation Cutoff, and Page Location.
+- **Left Rail Navigation:** Grouped rail (`MONITOR`, `PLAN`, `EVALUATE`) with active-state indicator bars, count pills (`18k`, `5`, `0.693`), and zero radio bullets.
+
+### 2. Command Centre Overview ([`app/views/overview.py`](app/views/overview.py))
+- **5-Figure Fixed Metric Strip:** Total Signups, KYC Completed, Funded Accounts, Traded $\le$ 30 Days, and Dormant by Day 90 with 3-month trailing delta trends.
+- **Hybrid Funnel Ledger:** Stage count, % of cohort, and step conversion rate with the primary onboarding leak highlighted.
+- **Trading Velocity Analysis:** Horizontal bar breakdown of dormancy rate by speed of first trade with direct CTA button routing immediately to the Hesitant queue.
+- **Monthly Cohort Heatmap:** Uniform green matrix tracking Day 31-60 and Day 61-90 retention decay across calendar cohorts.
+
+### 3. Master-Detail Risk Queue ([`app/views/risk_queue.py`](app/views/risk_queue.py))
+- **Segment Triage Tabs:** Quick filtering across Hesitant, Burned, Browser, Unfunded, and Monitor segments with live account count pills.
+- **Master Table:** 65% width data grid with inline risk bars, colored segment tags, and row selection. All-"Yes" contact column eliminated.
+- **Intervention Ticket Order Drawer:** 35% sticky right-hand panel modeled on a trading order ticket:
+  - User summary and visual risk meter.
+  - **Polarity-Corrected Driver Analysis:** Distinctly separates factors pushing risk up (▲ Raising Risk) from protective retention activity (▼ Protective Signals).
+  - Recommended action and delivery channel.
+  - Live editable message copy preview.
+  - Triage actions (**Approve Batch**, **Skip Account**, **Snooze 7 Days**) with session state counters and approved-only CSV export.
+
+### 4. Segments & Economics Ledger ([`app/views/segments_playbook.py`](app/views/segments_playbook.py))
+- **Authoritative Economics Engine:** Centralized in [`src/economics.py`](src/economics.py) guaranteeing ₹10.15L Total Cohort Net EV consistency across all views.
+- **Segment Economics Ledger:** Clean unit economics table with no truncated columns (`Accounts`, `Share %`, `Avg Risk`, `Save Rate`, `LTV`, `Net EV`, `Break-Even Risk R*`, `Channel`).
+- **Horizontal EV Distribution:** Horizontal bar chart with outside gutter labels and negative-value offset.
+- **Integrated Playbook Container:** Segment rules, economic assumptions, operational actions, and message copy unified in a single container card.
+
+### 5. Experiment Planner ([`app/views/experiment_planner.py`](app/views/experiment_planner.py))
+- **Segmented Control:** Rapidly preloads segment parameters or custom baseline assumptions.
+- **Linked Units & Bounds:** Dual slider + number input controls with explicit unit suffixes (`%.1f%%`, `%d accounts/day`).
+- **Sample Size vs MDE Power Curve:** Interactive curve with current operational setting marked.
+- **Dynamic Decision Rules:** Pre-committed `SHIP TO 100%`, `ITERATE VARIANT`, and `STOP & ARCHIVE` protocols dynamically populated with current threshold values.
+- **Two-Proportion Test Read-Out:** Trial results evaluation reporting relative lift, confidence intervals, p-value, and an institutional verdict badge.
+- **Markdown Export:** Instant download of a complete experiment pre-registration brief (`.md`).
+
+### 6. Model & Capacity Threshold Optimizer ([`app/views/model_threshold.py`](app/views/model_threshold.py))
+- **3-Decimal Precision:** Hold-out metrics (ROC AUC `0.693`, PR AUC `0.566`, Brier `0.211`) formatted strictly to 3 decimals with baseline deltas.
+- **Aggregated Channel Importances:** One-hot channel features aggregated into root `Acquisition Channel` (+0.062 AUC drop).
+- **3-Tab Diagnostic Workbench:** ROC Curve, Decile Probability Calibration Plot ($y=x$ ideal benchmark), and Cumulative Gain Chart.
+- **Capacity-Constrained Optimizer:** Replaces unconstrained 100% recommendations with operational CRM capacity limits:
+  $$\text{Cutoff} = \min(N_{\text{breakeven}}, \text{Weekly Capacity})$$
+  Reports operational regime, marginal account Net EV, and cumulative EV curve with cutoff marker.
 
 ---
 
-## How to Run from a Clean Clone
+## Quickstart & Runbook
 
 ### 1. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Run the End-to-End Pipeline
-Generates synthetic data, creates the SQLite database, validates SQL queries, extracts Day-14 features, trains baseline and gradient boosting models, and scores all 20,000 users:
+### 2. Run Pipeline (Synthetic Generation, DB Build, Training, Scoring)
 ```bash
 python -m src.pipeline
 ```
 
 ### 3. Run Test Suite
-Executes all 10 unit and integration tests (including the Day-14 post-cutoff leakage test):
 ```bash
 pytest
 ```
+*Current status: **19 passed in 4.40s** (including end-to-end `AppTest` on all views).*
 
-### 4. Launch the Streamlit Console
+### 4. Launch Local Terminal
 ```bash
 streamlit run app/main.py
 ```
-Open `http://localhost:8501` in your browser.
+Open **`http://localhost:8501`** in your browser.
+
+### 5. Launch Cloudflare Public Tunnel (Optional)
+```bash
+.\scratch\cloudflared.exe tunnel --url http://localhost:8501
+```
 
 ---
 
-## Design System
+## Test Verification Summary
 
-In compliance with `SPEC.md`:
-- **Palette**: Cool grey canvas (`#F5F6F8`), white surfaces (`#FFFFFF`), ink (`#17212B`), one petrol accent (`#0E5A6B`), muted red (`#A63D40`) and amber (`#B7791F`) used exclusively for risk.
-- **Typography**: Single typeface (**Public Sans**) enforced across all text, inputs, and charts.
-- **Key Figures**: Displayed in continuous ruled horizontal strips (`border-top` and `border-bottom: 1px solid #E2E5E9`) rather than rows of cards.
-- **Currency**: Indian digit grouping (`₹1,23,456` and compact `₹54.20L`).
-- **Restraint**: Zero emoji, gradients, drop shadows, all-caps text, or decorative animations.
-- **Charts**: Minimalist Plotly figures with hidden toolbars, `#ECEEF1` light gridlines, and direct data labels.
+```text
+tests/test_economics.py ....                                            [ 21%]
+tests/test_leakage.py ..                                                [ 31%]
+tests/test_segments.py ..                                               [ 42%]
+tests/test_stats.py ..                                                  [ 52%]
+tests/test_train.py ..                                                  [ 63%]
+tests/test_views.py .......                                             [100%]
 
----
-
-## Limitations & Honest Data Science Caveats
-
-1. **Synthetic Data**: Distributions reflect simulated behavioral rules calibrated to industry averages; real brokerage environments exhibit non-linear macroeconomic shocks and market sentiment shifts.
-2. **Correlation vs. Causation**: High risk denotes strong association with churn; intervention will only succeed if the underlying root causes are causally reversible.
-3. **Assumed Save Rates & LTVs**: The ₹15 contact threshold and segment save rates are operational assumptions that must be empirically measured via controlled A/B experiments.
-4. **Day-14 Information Horizon**: The model intentionally ignores events after Day 14 to avoid lookahead bias. Shocks occurring on Day 30 or Day 45 (e.g., sudden market crashes or customer support escalations) cannot be predicted by this model.
-5. **Static Contact Costs**: Contact cost is modeled at a uniform ₹15 per user; in practice, automated notifications cost substantially less than manual Relationship Manager phone outreach.
+============================= 19 passed in 4.40s ==============================
+```
