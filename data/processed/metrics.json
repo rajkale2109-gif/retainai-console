@@ -1,0 +1,492 @@
+{
+  "train_size": 14953,
+  "test_size": 5047,
+  "split_date": "2025-10-01",
+  "models": {
+    "logistic_regression": {
+      "roc_auc": 0.6942,
+      "pr_auc": 0.5719,
+      "brier_score": 0.211,
+      "top_decile_capture": 0.1777,
+      "top_decile_lift": 1.78
+    },
+    "gradient_boosting": {
+      "roc_auc": 0.693,
+      "pr_auc": 0.5659,
+      "brier_score": 0.2114,
+      "top_decile_capture": 0.1752,
+      "top_decile_lift": 1.75
+    }
+  },
+  "roc_curve_gb": [
+    {
+      "fpr": 0.0,
+      "tpr": 0.0
+    },
+    {
+      "fpr": 0.0071,
+      "tpr": 0.0232
+    },
+    {
+      "fpr": 0.0106,
+      "tpr": 0.0335
+    },
+    {
+      "fpr": 0.0206,
+      "tpr": 0.0762
+    },
+    {
+      "fpr": 0.0238,
+      "tpr": 0.0917
+    },
+    {
+      "fpr": 0.0287,
+      "tpr": 0.1036
+    },
+    {
+      "fpr": 0.0338,
+      "tpr": 0.1154
+    },
+    {
+      "fpr": 0.038,
+      "tpr": 0.1391
+    },
+    {
+      "fpr": 0.0425,
+      "tpr": 0.151
+    },
+    {
+      "fpr": 0.0493,
+      "tpr": 0.1664
+    },
+    {
+      "fpr": 0.057,
+      "tpr": 0.185
+    },
+    {
+      "fpr": 0.0628,
+      "tpr": 0.2045
+    },
+    {
+      "fpr": 0.0689,
+      "tpr": 0.2241
+    },
+    {
+      "fpr": 0.075,
+      "tpr": 0.238
+    },
+    {
+      "fpr": 0.0827,
+      "tpr": 0.2478
+    },
+    {
+      "fpr": 0.0895,
+      "tpr": 0.2581
+    },
+    {
+      "fpr": 0.0943,
+      "tpr": 0.2705
+    },
+    {
+      "fpr": 0.1001,
+      "tpr": 0.2803
+    },
+    {
+      "fpr": 0.1069,
+      "tpr": 0.2952
+    },
+    {
+      "fpr": 0.113,
+      "tpr": 0.3081
+    },
+    {
+      "fpr": 0.1191,
+      "tpr": 0.3225
+    },
+    {
+      "fpr": 0.1265,
+      "tpr": 0.3333
+    },
+    {
+      "fpr": 0.1401,
+      "tpr": 0.357
+    },
+    {
+      "fpr": 0.1484,
+      "tpr": 0.3673
+    },
+    {
+      "fpr": 0.1571,
+      "tpr": 0.3807
+    },
+    {
+      "fpr": 0.1636,
+      "tpr": 0.391
+    },
+    {
+      "fpr": 0.1722,
+      "tpr": 0.4008
+    },
+    {
+      "fpr": 0.178,
+      "tpr": 0.4132
+    },
+    {
+      "fpr": 0.1861,
+      "tpr": 0.4199
+    },
+    {
+      "fpr": 0.1929,
+      "tpr": 0.4292
+    },
+    {
+      "fpr": 0.1986,
+      "tpr": 0.4384
+    },
+    {
+      "fpr": 0.207,
+      "tpr": 0.4513
+    },
+    {
+      "fpr": 0.2141,
+      "tpr": 0.4647
+    },
+    {
+      "fpr": 0.2193,
+      "tpr": 0.4755
+    },
+    {
+      "fpr": 0.2276,
+      "tpr": 0.4838
+    },
+    {
+      "fpr": 0.2328,
+      "tpr": 0.492
+    },
+    {
+      "fpr": 0.2411,
+      "tpr": 0.5039
+    },
+    {
+      "fpr": 0.2486,
+      "tpr": 0.5126
+    },
+    {
+      "fpr": 0.2569,
+      "tpr": 0.5281
+    },
+    {
+      "fpr": 0.264,
+      "tpr": 0.5353
+    },
+    {
+      "fpr": 0.2717,
+      "tpr": 0.5446
+    },
+    {
+      "fpr": 0.2798,
+      "tpr": 0.5559
+    },
+    {
+      "fpr": 0.2853,
+      "tpr": 0.5631
+    },
+    {
+      "fpr": 0.2939,
+      "tpr": 0.5734
+    },
+    {
+      "fpr": 0.3033,
+      "tpr": 0.5827
+    },
+    {
+      "fpr": 0.312,
+      "tpr": 0.594
+    },
+    {
+      "fpr": 0.3226,
+      "tpr": 0.6028
+    },
+    {
+      "fpr": 0.3303,
+      "tpr": 0.61
+    },
+    {
+      "fpr": 0.341,
+      "tpr": 0.6208
+    },
+    {
+      "fpr": 0.3503,
+      "tpr": 0.6321
+    },
+    {
+      "fpr": 0.3606,
+      "tpr": 0.6419
+    },
+    {
+      "fpr": 0.369,
+      "tpr": 0.6528
+    },
+    {
+      "fpr": 0.3786,
+      "tpr": 0.6595
+    },
+    {
+      "fpr": 0.3886,
+      "tpr": 0.6687
+    },
+    {
+      "fpr": 0.4008,
+      "tpr": 0.6749
+    },
+    {
+      "fpr": 0.4124,
+      "tpr": 0.6873
+    },
+    {
+      "fpr": 0.4221,
+      "tpr": 0.6971
+    },
+    {
+      "fpr": 0.4305,
+      "tpr": 0.7063
+    },
+    {
+      "fpr": 0.4398,
+      "tpr": 0.7141
+    },
+    {
+      "fpr": 0.4488,
+      "tpr": 0.7192
+    },
+    {
+      "fpr": 0.462,
+      "tpr": 0.7264
+    },
+    {
+      "fpr": 0.4707,
+      "tpr": 0.7331
+    },
+    {
+      "fpr": 0.4839,
+      "tpr": 0.7409
+    },
+    {
+      "fpr": 0.491,
+      "tpr": 0.7496
+    },
+    {
+      "fpr": 0.4997,
+      "tpr": 0.7573
+    },
+    {
+      "fpr": 0.5074,
+      "tpr": 0.7625
+    },
+    {
+      "fpr": 0.5187,
+      "tpr": 0.7743
+    },
+    {
+      "fpr": 0.5248,
+      "tpr": 0.7821
+    },
+    {
+      "fpr": 0.5322,
+      "tpr": 0.7939
+    },
+    {
+      "fpr": 0.5448,
+      "tpr": 0.8022
+    },
+    {
+      "fpr": 0.5528,
+      "tpr": 0.8104
+    },
+    {
+      "fpr": 0.5634,
+      "tpr": 0.8171
+    },
+    {
+      "fpr": 0.5705,
+      "tpr": 0.8233
+    },
+    {
+      "fpr": 0.5789,
+      "tpr": 0.8326
+    },
+    {
+      "fpr": 0.5866,
+      "tpr": 0.8393
+    },
+    {
+      "fpr": 0.5943,
+      "tpr": 0.8444
+    },
+    {
+      "fpr": 0.6091,
+      "tpr": 0.8516
+    },
+    {
+      "fpr": 0.6252,
+      "tpr": 0.8599
+    },
+    {
+      "fpr": 0.6436,
+      "tpr": 0.8671
+    },
+    {
+      "fpr": 0.6529,
+      "tpr": 0.8733
+    },
+    {
+      "fpr": 0.6716,
+      "tpr": 0.8805
+    },
+    {
+      "fpr": 0.6825,
+      "tpr": 0.8877
+    },
+    {
+      "fpr": 0.697,
+      "tpr": 0.8954
+    },
+    {
+      "fpr": 0.7102,
+      "tpr": 0.9011
+    },
+    {
+      "fpr": 0.7302,
+      "tpr": 0.9093
+    },
+    {
+      "fpr": 0.7489,
+      "tpr": 0.9155
+    },
+    {
+      "fpr": 0.7595,
+      "tpr": 0.9222
+    },
+    {
+      "fpr": 0.783,
+      "tpr": 0.9284
+    },
+    {
+      "fpr": 0.7972,
+      "tpr": 0.9361
+    },
+    {
+      "fpr": 0.8123,
+      "tpr": 0.9428
+    },
+    {
+      "fpr": 0.8258,
+      "tpr": 0.9464
+    },
+    {
+      "fpr": 0.8422,
+      "tpr": 0.95
+    },
+    {
+      "fpr": 0.8558,
+      "tpr": 0.9567
+    },
+    {
+      "fpr": 0.8719,
+      "tpr": 0.9614
+    },
+    {
+      "fpr": 0.8812,
+      "tpr": 0.9686
+    },
+    {
+      "fpr": 0.8889,
+      "tpr": 0.9758
+    },
+    {
+      "fpr": 0.9089,
+      "tpr": 0.9809
+    },
+    {
+      "fpr": 0.9337,
+      "tpr": 0.9871
+    },
+    {
+      "fpr": 0.9633,
+      "tpr": 0.9928
+    },
+    {
+      "fpr": 1.0,
+      "tpr": 1.0
+    }
+  ],
+  "feature_importances": [
+    {
+      "raw_feature": "is_funded_d14",
+      "feature": "Account funded status",
+      "importance": 0.0946,
+      "std": 0.0069
+    },
+    {
+      "raw_feature": "acquisition_channel_influencer",
+      "feature": "Acquisition channel: Influencer",
+      "importance": 0.0288,
+      "std": 0.0035
+    },
+    {
+      "raw_feature": "acquisition_channel_referral",
+      "feature": "Acquisition channel: Referral",
+      "importance": 0.0108,
+      "std": 0.0018
+    },
+    {
+      "raw_feature": "acquisition_channel_performance_ad",
+      "feature": "Acquisition channel: Performance Ad",
+      "importance": 0.0107,
+      "std": 0.0011
+    },
+    {
+      "raw_feature": "acquisition_channel_organic",
+      "feature": "Acquisition channel: Organic",
+      "importance": 0.0057,
+      "std": 0.0012
+    },
+    {
+      "raw_feature": "acquisition_channel_paid_search",
+      "feature": "Acquisition channel: Paid Search",
+      "importance": 0.0056,
+      "std": 0.0014
+    },
+    {
+      "raw_feature": "trade_count_d14",
+      "feature": "Number of trades",
+      "importance": 0.003,
+      "std": 0.0011
+    },
+    {
+      "raw_feature": "kyc_completed_d14",
+      "feature": "KYC completed within 14 days",
+      "importance": 0.002,
+      "std": 0.0007
+    },
+    {
+      "raw_feature": "total_watchlist_adds_d14",
+      "feature": "Watchlist stock additions",
+      "importance": 0.0017,
+      "std": 0.0007
+    },
+    {
+      "raw_feature": "last_session_day_d14",
+      "feature": "Latest active session day",
+      "importance": 0.0014,
+      "std": 0.001
+    }
+  ],
+  "caveats": [
+    "Synthetic Data: Calibrated on synthetic distributions; real retail broking user behaviour may feature seasonal market volatility and non-linear macroeconomic shocks.",
+    "Correlation vs. Causation: Model risk scores quantify churn correlation. An intervention will only yield net return if the identified drivers are causally responsive to the recommended action.",
+    "Assumed Save Rates & LTV: Segment save rates and lifetime values are operational assumptions. Real campaign performance must be calibrated through controlled A/B experiments.",
+    "Day-14 Blind Spot: Features strictly ignore post-day-14 behaviour to prevent leakage. Sudden user life events or sharp portfolio drawdowns occurring on day 25 or 40 are invisible to this predictor.",
+    "Static Contact Cost: Contact cost is fixed at \u20b915 per user; real blended contact costs vary significantly between automated SMS/WhatsApp nudges and human relationship manager phone calls."
+  ]
+}
