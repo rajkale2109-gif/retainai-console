@@ -55,14 +55,13 @@ def main() -> None:
     # Render mobile horizontal navigation pill bar for small viewports
     render_mobile_nav(active_page=selected_page)
 
-    # Graceful missing data handling
+    # Graceful missing data handling with auto-generation fallback
     if not data_ready():
-        render_empty_state(
-            title="Data pipeline has not been executed",
-            message="The SQLite database, user risk scores, and model artifacts were not found. Run the end-to-end data and training pipeline to generate the dataset.",
-            command="python -m src.pipeline",
-        )
-        return
+        with st.spinner("First-time setup: Generating 20,000-user database and training retention models (~15s)..."):
+            from src.pipeline import run_pipeline
+            run_pipeline()
+            st.cache_data.clear()
+            st.rerun()
 
     # Route to selected page
     if selected_page == "Overview":
