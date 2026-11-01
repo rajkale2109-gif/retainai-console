@@ -151,11 +151,28 @@ html, body, .stApp, .stMarkdown, .stText, p, h1, h2, h3, h4, h5, h6, label, inpu
     background-color: var(--color-canvas);
 }}
 
-/* Hide Streamlit default header decorations */
+/* Header styling: transparent background, keep sidebar collapse toggle accessible */
 header[data-testid="stHeader"] {{
     background: transparent !important;
-    height: 0px !important;
-    visibility: hidden !important;
+    height: 38px !important;
+    visibility: visible !important;
+    z-index: 9999 !important;
+}}
+
+[data-testid="collapsedControl"] {{
+    visibility: visible !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    top: 6px !important;
+    left: 6px !important;
+    z-index: 10000 !important;
+    background: var(--color-panel) !important;
+    border: 1px solid var(--color-border) !important;
+    border-radius: 4px !important;
+    color: var(--color-text-primary) !important;
+    width: 32px !important;
+    height: 32px !important;
 }}
 
 footer, #MainMenu {{
@@ -331,6 +348,122 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"] {{
 ::-webkit-scrollbar-thumb:hover {{
     background: var(--color-text-muted);
 }}
+
+/* ==========================================================================
+   MOBILE & RESPONSIVE ADAPTATIONS
+   ========================================================================== */
+
+/* Mobile & Tablet Navigation Strip */
+@media (min-width: 1024px) {{
+    .terminal-mobile-nav-container {{
+        display: none !important;
+    }}
+}}
+
+@media (max-width: 1023px) {{
+    .terminal-mobile-nav-container {{
+        display: block !important;
+        margin-top: 4px !important;
+        margin-bottom: 12px !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+    }}
+    .terminal-mobile-nav-container::-webkit-scrollbar {{
+        display: none !important;
+    }}
+    .terminal-mobile-nav-container div[data-testid="stSegmentedControl"] {{
+        display: inline-flex !important;
+        flex-wrap: nowrap !important;
+        gap: 4px !important;
+        min-width: max-content !important;
+        padding: 3px !important;
+    }}
+    .terminal-mobile-nav-container button {{
+        flex: 0 0 auto !important;
+        min-height: 38px !important;
+        padding: 6px 14px !important;
+        font-size: 12px !important;
+    }}
+}}
+
+/* Smartphone Adjustments (<= 768px) */
+@media (max-width: 768px) {{
+    /* Responsive block container padding */
+    .main .block-container {{
+        padding-top: 0.5rem !important;
+        padding-left: 0.6rem !important;
+        padding-right: 0.6rem !important;
+        padding-bottom: 2.5rem !important;
+        max-width: 100% !important;
+    }}
+
+    /* Metric Strip 2-Column Grid on Mobile */
+    .terminal-metric-strip {{
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1px !important;
+        background: var(--color-border) !important;
+        margin: 8px 0 12px 0 !important;
+    }}
+    .terminal-metric-item {{
+        border-right: none !important;
+        background: var(--color-panel) !important;
+        padding: 8px 10px !important;
+        min-width: 0 !important;
+    }}
+    .terminal-metric-item:nth-child(5) {{
+        grid-column: span 2 !important;
+    }}
+    .terminal-metric-item div:nth-child(2) {{
+        font-size: 18px !important;
+    }}
+
+    /* Ticker scrollable bar on mobile */
+    .terminal-top-ticker {{
+        gap: 8px !important;
+        font-size: 10px !important;
+        padding: 4px 8px !important;
+        margin-top: 3px !important;
+    }}
+
+    /* Mobile Status Bar */
+    .terminal-status-bar {{
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 4px !important;
+        padding: 6px 10px !important;
+    }}
+    .terminal-status-left {{
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+    }}
+    .terminal-status-right {{
+        display: none !important;
+    }}
+
+    /* Touch Targets */
+    .stButton > button {{
+        min-height: 38px !important;
+        font-size: 13px !important;
+    }}
+    input, textarea, select {{
+        font-size: 14px !important;
+    }}
+
+    /* Responsive Plotly Charts */
+    .js-plotly-plot {{
+        width: 100% !important;
+    }}
+
+    /* Segmented Control scrollable */
+    div[data-testid="stSegmentedControl"] {{
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }}
+}}
 </style>
 """
     st.html(css)
@@ -358,12 +491,12 @@ def render_top_bar(current_page: str) -> None:
 
     with col_ticker:
         st.html(
-            f'<div style="display:flex; align-items:center; gap:16px; font-size:11px; color:{t.text_muted}; background:{t.panel}; border:1px solid {t.border}; border-radius:3px; padding:5px 12px; margin-top:1px;">'
-            f'<div><strong>COHORT:</strong> 2025 Jan-Dec (20,000)</div>'
+            f'<div class="terminal-top-ticker" style="display:flex; align-items:center; gap:14px; font-size:11px; color:{t.text_muted}; background:{t.panel}; border:1px solid {t.border}; border-radius:3px; padding:5px 10px; margin-top:1px; overflow-x:auto; white-space:nowrap;">'
+            f'<div><strong>COHORT:</strong> 2025 Jan-Dec (20k)</div>'
             f'<div style="color:{t.border};">|</div>'
             f'<div><strong>PREDICTION:</strong> Day 14</div>'
             f'<div style="color:{t.border};">|</div>'
-            f'<div><strong>MODEL:</strong> HistGB (AUC 0.693)</div>'
+            f'<div><strong>MODEL:</strong> HistGB (0.693)</div>'
             f'<div style="color:{t.border};">|</div>'
             f'<div><strong>AS-OF:</strong> 2025-12-31</div>'
             f'<div style="color:{t.border};">|</div>'
@@ -375,6 +508,32 @@ def render_top_bar(current_page: str) -> None:
         if st.button(theme_btn_label, key="theme_toggle_btn", use_container_width=True):
             st.session_state["retainai_theme"] = other_theme
             st.rerun()
+
+
+def render_mobile_nav(active_page: str) -> None:
+    """Render a mobile-optimized thumb navigation bar that displays on small viewports."""
+    page_map = {
+        "Overview": "Overview",
+        "Risk queue": "Risk Queue",
+        "Segments and playbook": "Playbook",
+        "Experiment planner": "A/B Planner",
+        "Model and threshold": "Model & Cutoff",
+    }
+    st.html('<div class="terminal-mobile-nav-container">')
+    selected = st.segmented_control(
+        "Mobile Navigation",
+        options=list(page_map.keys()),
+        format_func=lambda k: page_map.get(k, k),
+        default=active_page,
+        key="mobile_nav_segmented_control",
+        label_visibility="collapsed",
+    )
+    st.html('</div>')
+
+    if selected and selected != active_page:
+        st.session_state["current_nav_page"] = selected
+        st.query_params["page"] = selected
+        st.rerun()
 
 
 def render_sidebar_rail() -> str:
@@ -437,14 +596,14 @@ def render_status_bar(
     """Render thin anchored status line at the bottom of the workspace."""
     t = get_current_theme()
     st.html(
-        f'<div style="display:flex; justify-content:space-between; align-items:center; width:100%; font-size:11px; color:{t.text_muted}; '
+        f'<div class="terminal-status-bar" style="display:flex; justify-content:space-between; align-items:center; width:100%; font-size:11px; color:{t.text_muted}; '
         f'background:{t.panel}; border:1px solid {t.border}; border-radius:3px; padding:4px 12px; margin-top:24px;">'
-        f'<div style="display:flex; gap:16px;">'
+        f'<div class="terminal-status-left" style="display:flex; gap:16px;">'
         f'<span><strong>FILTER:</strong> {active_filters}</span>'
         f'<span><strong>DISPLAYING:</strong> {rows_shown:,} accounts</span>'
         f'<span><strong>APPROVED BATCH:</strong> {approved_count}</span>'
         f'</div>'
-        f'<div style="display:flex; gap:16px; font-family:var(--font-mono);">'
+        f'<div class="terminal-status-right" style="display:flex; gap:16px; font-family:var(--font-mono);">'
         f'<span>CACHE: 12ms</span>'
         f'<span>HOST: Local:8501</span>'
         f'</div>'
@@ -509,7 +668,7 @@ def render_metric_strip(metrics: List[Dict[str, Any]]) -> None:
             delta_html = f'<span style="color:{color}; font-size:11px; font-weight:600; margin-left:6px;">{delta} {arrow}</span>'
 
         items.append(
-            f'<div style="flex:1; min-width:140px; padding:8px 14px; border-right:1px solid {t.border}; display:flex; flex-direction:column; justify-content:center;">'
+            f'<div class="terminal-metric-item" style="flex:1; min-width:140px; padding:8px 14px; border-right:1px solid {t.border}; display:flex; flex-direction:column; justify-content:center;">'
             f'<div style="font-size:11px; color:{t.text_muted}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px;">{label}</div>'
             f'<div style="font-size:20px; font-weight:700; color:{t.text_primary}; line-height:1.2; font-variant-numeric:tabular-nums;">'
             f'{value} {delta_html}'
@@ -522,7 +681,7 @@ def render_metric_strip(metrics: List[Dict[str, Any]]) -> None:
         items[-1] = items[-1].replace(f"border-right:1px solid {t.border};", "border-right:none;")
 
     strip_html = (
-        f'<div style="display:flex; flex-direction:row; flex-wrap:wrap; width:100%; background:{t.panel}; '
+        f'<div class="terminal-metric-strip" style="display:flex; flex-direction:row; flex-wrap:wrap; width:100%; background:{t.panel}; '
         f'border:1px solid {t.border}; border-radius:3px; margin:12px 0 16px 0; min-height:68px;">'
         f'{"".join(items)}'
         f'</div>'

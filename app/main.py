@@ -21,6 +21,7 @@ from app.ui import (
     inject_terminal_styles,
     render_top_bar,
     render_sidebar_rail,
+    render_mobile_nav,
     render_status_bar,
     render_empty_state,
 )
@@ -50,6 +51,9 @@ def main() -> None:
 
     # Render global top telemetry bar
     render_top_bar(current_page=selected_page)
+
+    # Render mobile horizontal navigation pill bar for small viewports
+    render_mobile_nav(active_page=selected_page)
 
     # Graceful missing data handling
     if not data_ready():

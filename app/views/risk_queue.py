@@ -226,6 +226,23 @@ def render() -> None:
 
     # 5. Detail View: Intervention Ticket Drawer (Modelled on Broker Order Ticket)
     with ticket_col:
+        # Current index in display_df & Touch-Friendly Account Stepper
+        current_acc_str = f"USR-{raw_uid:05d}"
+        acc_list = display_df["user_id"].tolist()
+        curr_acc_idx = acc_list.index(current_acc_str) if current_acc_str in acc_list else 0
+
+        nav_prev_col, nav_info_col, nav_next_col = st.columns([1, 1.8, 1], gap="small")
+        with nav_prev_col:
+            if st.button("◀ Prev", key=f"prev_acc_btn_{raw_uid}", use_container_width=True, disabled=(curr_acc_idx == 0)):
+                st.session_state["selected_user_id"] = acc_list[curr_acc_idx - 1]
+                st.rerun()
+        with nav_info_col:
+            st.html(f'<div style="text-align:center; font-size:11px; color:{t.text_muted}; padding-top:6px; font-variant-numeric:tabular-nums;">Account {curr_acc_idx + 1} of {len(acc_list)}</div>')
+        with nav_next_col:
+            if st.button("Next ▶", key=f"next_acc_btn_{raw_uid}", use_container_width=True, disabled=(curr_acc_idx >= len(acc_list) - 1)):
+                st.session_state["selected_user_id"] = acc_list[curr_acc_idx + 1]
+                st.rerun()
+
         u_risk_pct = user_record["predicted_risk"] * 100.0
         u_ev = user_record["expected_value"]
         u_seg = user_record["segment"]
